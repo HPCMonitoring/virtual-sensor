@@ -1,5 +1,7 @@
-#include <iostream>
+#include "main.h"
 
-int main(int, char**) {
-    std::cout << "Hello, world!\n";
+int main()
+{
+    ProcessInfo processInfo = ProcessInfo(1);
+    return 0;
 }
