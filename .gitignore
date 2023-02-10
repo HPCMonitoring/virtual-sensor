@@ -1,3 +1,4 @@
 build
 vsensor
 .vscode
+*.txt
