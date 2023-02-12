@@ -21,6 +21,7 @@ make check_memory_leak
 Rules:
 
 - No unused variables
+- Prefer use const for not modified variables and parameters
 - Unused method must throw "Unimplemented !" exception
 - Use header guard when declare a header file and its implementation file
 - NO hard codes
