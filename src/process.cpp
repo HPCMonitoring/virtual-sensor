@@ -1,4 +1,5 @@
 #include "process.h"
+#include "exceptions.h"
 
 #ifdef __PROCESS_H__
 
@@ -11,12 +12,12 @@ inline bool fileExists(const std::string &name)
 ProcessInfo::ProcessInfo(pid_t pid)
 {
     if (pid < 0)
-        throw ERR_INVALID_PID;
+        throw InvalidPID();
 
     std::string processEntryDir = "/proc/" + std::to_string(pid);
     this->statusFilename = processEntryDir + "/status";
     if (!fileExists(this->statusFilename))
-        throw ERR_PROCESS_NOT_EXISTS;
+        throw ProcessNotExists();
 
     this->executePath = processEntryDir + "/exe";
     this->commandFilename = processEntryDir + "/cmdline";

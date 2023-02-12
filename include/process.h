@@ -1,16 +1,9 @@
 #ifndef __PROCESS_H__
 #define __PROCESS_H__
 
-#include <iostream>
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <climits>
+#include "main.h"
 
-#define ERR_PROCESS_NOT_EXISTS "Process does not exists !"
-#define ERR_INVALID_PID "Invalid process's ID !"
+
 
 enum ProcessStatusInfoLine
 {

@@ -1,9 +1,15 @@
-#include "main.h"
+#include "process.h"
 
 int main()
 {
-    ProcessInfo processInfo = ProcessInfo(3216);
-    processInfo.getGid();
-    processInfo.print();
+    try
+    {
+        ProcessInfo processInfo = ProcessInfo(-1);
+        processInfo.getGid();
+        processInfo.print();
+    } catch(const std::exception &e) {
+        std::cout << e.what() << std::endl;
+    }
+
     return 0;
 }
