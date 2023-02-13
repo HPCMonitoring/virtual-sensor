@@ -24,8 +24,6 @@ ProcessInfo::ProcessInfo(pid_t pid)
     this->pid = pid;
     this->parentPid = -1;
     this->uid = this->gid = UINT_MAX;
-    this->virtualMemoryUsage = this->physicalMemoryUsage = this->cpuTime = ULONG_MAX;
-    this->cpuUtilization = -1;
     this->networkInBandwidth = this->networkOutBandwidth = -1;
     this->ioRead = this->ioWrite = ULONG_MAX;
     this->name = this->executePath = this->command = "";
@@ -34,7 +32,7 @@ ProcessInfo::ProcessInfo(pid_t pid)
 std::string ProcessInfo::getName()
 {
     if (this->name.length() == 0)
-        this->_readProcessInfoFile(ProcessStatusInfoLine::NAME);
+        this->name = this->_readProcessInfoFile(ProcessStatusInfoLine::NAME);
     return this->name;
 }
 
@@ -46,21 +44,30 @@ pid_t ProcessInfo::getPid()
 pid_t ProcessInfo::getParentPid()
 {
     if (this->parentPid < 0)
-        this->_readProcessInfoFile(ProcessStatusInfoLine::PARENT_PID);
+    {
+        std::string parentPid = this->_readProcessInfoFile(ProcessStatusInfoLine::PARENT_PID);
+        this->parentPid = std::stoi(parentPid);
+    }
     return this->parentPid;
 }
 
 uid_t ProcessInfo::getUid()
 {
     if (this->uid == UINT_MAX)
-        this->_readProcessInfoFile(ProcessStatusInfoLine::UID);
+    {
+        std::string uid = this->_readProcessInfoFile(ProcessStatusInfoLine::UID);
+        this->uid = std::stoul(uid);
+    }
     return this->uid;
 }
 
 gid_t ProcessInfo::getGid()
 {
     if (this->gid == UINT_MAX)
-        this->_readProcessInfoFile(ProcessStatusInfoLine::GID);
+    {
+        std::string gid = this->_readProcessInfoFile(ProcessStatusInfoLine::GID);
+        this->gid = std::stoul(gid);
+    }
     return this->gid;
 }
 
@@ -71,7 +78,7 @@ std::string ProcessInfo::getExecutePath()
 
     std::string execPathFilename = this->processEntryDirname + "/exe";
 
-    char execPath[200];
+    char execPath[BUFFER_SIZE];
     ssize_t len = readlink(execPathFilename.c_str(), execPath, sizeof(execPath) - 1);
     if (len != -1)
     {
@@ -89,30 +96,25 @@ std::string ProcessInfo::getCommand()
     std::ifstream cmdLineFile(this->processEntryDirname + "/cmdline");
     if (!cmdLineFile.is_open())
         return "";
-    
+
     std::getline(cmdLineFile, this->command);
     return this->command;
 }
 
 ulong ProcessInfo::getVirtualMemoryUsage()
 {
-    if (this->virtualMemoryUsage == ULONG_MAX)
-        this->_readProcessInfoFile(ProcessStatusInfoLine::VM_SIZE);
-    return this->virtualMemoryUsage;
+    std::string virtualMemoryUsage = this->_readProcessInfoFile(ProcessStatusInfoLine::VM_SIZE);
+    return std::stoul(virtualMemoryUsage);
 }
 
 ulong ProcessInfo::getPhysicalMemoryUsage()
 {
-    if (this->physicalMemoryUsage == ULONG_MAX)
-        this->_readProcessInfoFile(ProcessStatusInfoLine::RSS);
-    return this->physicalMemoryUsage;
+    std::string physicalMemoryUsage = this->_readProcessInfoFile(ProcessStatusInfoLine::RSS);
+    return std::stoul(physicalMemoryUsage);
 }
 
-ulong ProcessInfo::getCpuTime()
+double ProcessInfo::getCpuTime()
 {
-    if (this->cpuTime != ULONG_MAX)
-        return this->cpuTime;
-
     std::ifstream statFile(this->processEntryDirname + "/stat");
     if (!statFile.is_open())
         return 0;
@@ -144,16 +146,33 @@ ulong ProcessInfo::getCpuTime()
         value.clear();
     }
 
-    this->cpuTime = (double)(sysCpuTime + userCpuTime) / CLOCK_PER_MILISECS;
-    return this->cpuTime;
+    return (double)(sysCpuTime + userCpuTime) / CLOCK_PER_MILISECS;
 }
 
-// TODO
-float ProcessInfo::getCpuUtilization()
+float ProcessInfo::getCpuUsage()
 {
-    if (this->cpuUtilization >= 0)
-        return this->cpuUtilization;
-    return 0;
+    std::string command = "ps -p " + std::to_string(this->pid) + " -o \%cpu";
+    FILE *pipe = popen(command.c_str(), "r");
+
+    char buffer[BUFFER_SIZE];
+    std::string result = "";
+    short lineNumber = 0;
+
+    while (!feof(pipe) && fgets(buffer, BUFFER_SIZE, pipe) != NULL)
+    {
+        if (lineNumber == 1)
+        {
+            result += buffer;
+            break;
+        }
+        lineNumber++;
+    }
+    pclose(pipe);
+
+    result.pop_back();  // Remove \n character
+    result.erase(0, 1); // Remove whitespace character
+
+    return std::stof(result);
 }
 
 // TODO
@@ -188,18 +207,18 @@ ulong ProcessInfo::getIoWrite()
     return 0;
 }
 
-void ProcessInfo::print()
-{
-    std::cout << "Name: " << this->name << std::endl;
-    std::cout << "Pid: " << this->pid << std::endl;
-    std::cout << "Parent Pid: " << this->parentPid << std::endl;
-    std::cout << "Uid: " << this->uid << std::endl;
-    std::cout << "Gid: " << this->gid << std::endl;
-    std::cout << "Virtual memory usage: " << this->virtualMemoryUsage << " KB" << std::endl;
-    std::cout << "Physical memory usage: " << this->physicalMemoryUsage << " KB" << std::endl;
-    std::cout << "Cpu time: " << this->cpuTime << " ms" << std::endl;
-    std::cout << "Execute path: " << this->executePath << std::endl;
-    std::cout << "Command: " << this->command << std::endl;
+void printProcessInfo(ProcessInfo* p) {
+    std::cout << "Name: " << p->getName() << std::endl;
+    std::cout << "Pid: " << p->getPid() << std::endl;
+    std::cout << "Parent Pid: " << p->getParentPid() << std::endl;
+    std::cout << "Uid: " << p->getUid() << std::endl;
+    std::cout << "Gid: " << p->getGid() << std::endl;
+    std::cout << "Virtual memory usage: " << p->getVirtualMemoryUsage() << " KB" << std::endl;
+    std::cout << "Physical memory usage: " << p->getPhysicalMemoryUsage() << " KB" << std::endl;
+    std::cout << "Cpu time: " << p->getCpuTime() << " ms" << std::endl;
+    std::cout << "Cpu usage: " << p->getCpuUsage() << " %" << std::endl;
+    std::cout << "Execute path: " << p->getExecutePath() << std::endl;
+    std::cout << "Command: " << p->getCommand() << std::endl;
 }
 
 #endif

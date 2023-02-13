@@ -4,6 +4,7 @@
 #include "main.h"
 
 #define CLOCK_PER_MILISECS 1000.0
+#define BUFFER_SIZE 128
 
 enum ProcessStatusInfoLine
 {
@@ -18,6 +19,7 @@ enum ProcessStatusInfoLine
 
 inline bool fileExists(const std::string &);
 
+// TODO: Reuse file pointer
 class ProcessInfo
 {
 private:
@@ -28,10 +30,6 @@ private:
     gid_t gid;
     std::string executePath;
     std::string command;
-    ulong virtualMemoryUsage;  // In KB
-    ulong physicalMemoryUsage; // In KB
-    double cpuTime;            // In ms
-    float cpuUtilization;      // In %
     double networkInBandwidth; // What interface ???
     double networkOutBandwidth;
     ulong ioWrite; // In KB
@@ -44,19 +42,17 @@ public:
     ProcessInfo(pid_t);
     std::string getName();
 
-    // PID, PPID, UID, GID is in the same file with positions increase respectively. For save execution cost, call by reverse order
     pid_t getPid();
     pid_t getParentPid();
     uid_t getUid();
     gid_t getGid();
-    ulong getVirtualMemoryUsage();
-    ulong getPhysicalMemoryUsage();
-
     std::string getExecutePath();
     std::string getCommand();
-    ulong getCpuTime();
 
-    float getCpuUtilization();
+    ulong getVirtualMemoryUsage();  // In KB
+    ulong getPhysicalMemoryUsage(); // In KB
+    double getCpuTime();            // In ms
+    float getCpuUsage();            // In %
     double getNetworkInBandwidth();
     double getNetworkOutBandwidth();
     ulong getIoWrite();
@@ -64,43 +60,25 @@ public:
     void print();
 
 private:
-    void _readProcessInfoFile(const ProcessStatusInfoLine lastLine)
+    std::string _readProcessInfoFile(const ProcessStatusInfoLine lineNumber)
     {
         std::ifstream processInfoFile(this->statusFilename);
         std::string line;
-        short lineNumber = 0;
+        std::string value;
+        short idx = 0;
 
         while (std::getline(processInfoFile, line))
         {
-            switch (lineNumber)
+            if (idx == lineNumber)
             {
-            case ProcessStatusInfoLine::NAME: // Read process name
-                this->name = this->_getFirstValueInLine(line);
-                break;
-            case ProcessStatusInfoLine::PARENT_PID: // Read parent PID
-                this->parentPid = std::stoi(this->_getFirstValueInLine(line));
-                break;
-            case ProcessStatusInfoLine::UID: // Read UID
-                this->uid = std::stoi(this->_getFirstValueInLine(line));
-                break;
-            case ProcessStatusInfoLine::GID: // Read GID
-                this->gid = std::stoi(this->_getFirstValueInLine(line));
-                break;
-            case ProcessStatusInfoLine::VM_SIZE: // Read GID
-                this->virtualMemoryUsage = std::stoul(this->_getFirstValueInLine(line));
-                break;
-            case ProcessStatusInfoLine::RSS: // Read GID
-                this->physicalMemoryUsage = std::stoul(this->_getFirstValueInLine(line));
-                break;
-            default:
+                value = this->_getFirstValueInLine(line);
                 break;
             }
-            if (lineNumber == lastLine)
-                break;
-            lineNumber++;
+            idx++;
         }
 
         processInfoFile.close();
+        return value;
     }
 
     /**
@@ -109,7 +87,7 @@ private:
      * @param line
      * @return uint
      */
-    std::string _getFirstValueInLine(std::string &line) const
+    inline std::string _getFirstValueInLine(std::string &line) const
     {
         std::stringstream ss(line);
         std::string token = "";
@@ -125,5 +103,7 @@ private:
         return line;
     }
 };
+
+void printProcessInfo(ProcessInfo *);
 
 #endif
