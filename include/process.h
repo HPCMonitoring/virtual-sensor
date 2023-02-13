@@ -3,7 +3,7 @@
 
 #include "main.h"
 
-
+#define CLOCK_PER_MILISECS 1000.0
 
 enum ProcessStatusInfoLine
 {
@@ -11,7 +11,9 @@ enum ProcessStatusInfoLine
     PID = 5,
     PARENT_PID = 6,
     UID = 8,
-    GID = 9
+    GID = 9,
+    VM_SIZE = 17,
+    RSS = 21
 };
 
 inline bool fileExists(const std::string &);
@@ -26,8 +28,9 @@ private:
     gid_t gid;
     std::string executePath;
     std::string command;
-    ulong memoryUsage; // In KB
-    ulong cpuTime;
+    ulong virtualMemoryUsage;  // In KB
+    ulong physicalMemoryUsage; // In KB
+    double cpuTime;            // In ms
     float cpuUtilization;      // In %
     double networkInBandwidth; // What interface ???
     double networkOutBandwidth;
@@ -35,8 +38,7 @@ private:
     ulong ioRead;  // In KB
 private:
     std::string statusFilename;
-    std::string executePathFilename;
-    std::string commandFilename;
+    std::string processEntryDirname;
 
 public:
     ProcessInfo(pid_t);
@@ -47,11 +49,13 @@ public:
     pid_t getParentPid();
     uid_t getUid();
     gid_t getGid();
+    ulong getVirtualMemoryUsage();
+    ulong getPhysicalMemoryUsage();
 
     std::string getExecutePath();
     std::string getCommand();
-    ulong getMemoryUsage();
     ulong getCpuTime();
+
     float getCpuUtilization();
     double getNetworkInBandwidth();
     double getNetworkOutBandwidth();
@@ -81,6 +85,12 @@ private:
                 break;
             case ProcessStatusInfoLine::GID: // Read GID
                 this->gid = std::stoi(this->_getFirstValueInLine(line));
+                break;
+            case ProcessStatusInfoLine::VM_SIZE: // Read GID
+                this->virtualMemoryUsage = std::stoul(this->_getFirstValueInLine(line));
+                break;
+            case ProcessStatusInfoLine::RSS: // Read GID
+                this->physicalMemoryUsage = std::stoul(this->_getFirstValueInLine(line));
                 break;
             default:
                 break;
