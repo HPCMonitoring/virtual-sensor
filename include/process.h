@@ -20,20 +20,21 @@ enum ProcessStatusInfoLine
 inline bool fileExists(const std::string &);
 
 // TODO: Reuse file pointer
+// Get raw info from /proc
 class ProcessInfo
 {
 private:
     std::string name;
-    pid_t pid;
-    pid_t parentPid;
-    uid_t uid;
-    gid_t gid;
+    std::string pid;
+    std::string parentPid;
+    std::string uid;
+    std::string gid;
     std::string executePath;
     std::string command;
-    double networkInBandwidth; // What interface ???
-    double networkOutBandwidth;
-    ulong ioWrite; // In KB
-    ulong ioRead;  // In KB
+    std::string networkInBandwidth; // What interface ???
+    std::string networkOutBandwidth;
+    std::string ioWrite; // In KB
+    std::string ioRead;  // In KB
 private:
     std::string statusFilename;
     std::string processEntryDirname;
@@ -42,22 +43,21 @@ public:
     ProcessInfo(pid_t);
     std::string getName();
 
-    pid_t getPid();
-    pid_t getParentPid();
-    uid_t getUid();
-    gid_t getGid();
+    std::string getPid();
+    std::string getParentPid();
+    std::string getUid();
+    std::string getGid();
     std::string getExecutePath();
     std::string getCommand();
 
-    ulong getVirtualMemoryUsage();  // In KB
-    ulong getPhysicalMemoryUsage(); // In KB
-    double getCpuTime();            // In ms
-    float getCpuUsage();            // In %
-    double getNetworkInBandwidth();
-    double getNetworkOutBandwidth();
-    ulong getIoWrite();
-    ulong getIoRead();
-    void print();
+    std::string getVirtualMemoryUsage();  // In KB
+    std::string getPhysicalMemoryUsage(); // In KB
+    std::string getCpuTime();            // In ms
+    std::string getCpuUsage();            // In %
+    std::string getNetworkInBandwidth();
+    std::string getNetworkOutBandwidth();
+    std::string getIoWrite();
+    std::string getIoRead();
 
 private:
     std::string _readProcessInfoFile(const ProcessStatusInfoLine lineNumber)

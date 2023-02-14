@@ -21,12 +21,7 @@ ProcessInfo::ProcessInfo(pid_t pid)
 
     this->processEntryDirname = processEntryDirname;
 
-    this->pid = pid;
-    this->parentPid = -1;
-    this->uid = this->gid = UINT_MAX;
-    this->networkInBandwidth = this->networkOutBandwidth = -1;
-    this->ioRead = this->ioWrite = ULONG_MAX;
-    this->name = this->executePath = this->command = "";
+    this->pid = std::to_string(pid);
 }
 
 std::string ProcessInfo::getName()
@@ -36,38 +31,29 @@ std::string ProcessInfo::getName()
     return this->name;
 }
 
-pid_t ProcessInfo::getPid()
+std::string ProcessInfo::getPid()
 {
     return this->pid;
 }
 
-pid_t ProcessInfo::getParentPid()
+std::string ProcessInfo::getParentPid()
 {
-    if (this->parentPid < 0)
-    {
-        std::string parentPid = this->_readProcessInfoFile(ProcessStatusInfoLine::PARENT_PID);
-        this->parentPid = std::stoi(parentPid);
-    }
+    if (this->parentPid.length() == 0)
+        this->parentPid = this->_readProcessInfoFile(ProcessStatusInfoLine::PARENT_PID);
     return this->parentPid;
 }
 
-uid_t ProcessInfo::getUid()
+std::string ProcessInfo::getUid()
 {
-    if (this->uid == UINT_MAX)
-    {
-        std::string uid = this->_readProcessInfoFile(ProcessStatusInfoLine::UID);
-        this->uid = std::stoul(uid);
-    }
+    if (this->uid.length() == 0)
+        this->uid = this->_readProcessInfoFile(ProcessStatusInfoLine::UID);
     return this->uid;
 }
 
-gid_t ProcessInfo::getGid()
+std::string ProcessInfo::getGid()
 {
-    if (this->gid == UINT_MAX)
-    {
-        std::string gid = this->_readProcessInfoFile(ProcessStatusInfoLine::GID);
-        this->gid = std::stoul(gid);
-    }
+    if (this->gid.length() == 0)
+        this->gid = this->_readProcessInfoFile(ProcessStatusInfoLine::GID);
     return this->gid;
 }
 
@@ -101,19 +87,17 @@ std::string ProcessInfo::getCommand()
     return this->command;
 }
 
-ulong ProcessInfo::getVirtualMemoryUsage()
+std::string ProcessInfo::getVirtualMemoryUsage()
 {
-    std::string virtualMemoryUsage = this->_readProcessInfoFile(ProcessStatusInfoLine::VM_SIZE);
-    return std::stoul(virtualMemoryUsage);
+    return this->_readProcessInfoFile(ProcessStatusInfoLine::VM_SIZE);
 }
 
-ulong ProcessInfo::getPhysicalMemoryUsage()
+std::string ProcessInfo::getPhysicalMemoryUsage()
 {
-    std::string physicalMemoryUsage = this->_readProcessInfoFile(ProcessStatusInfoLine::RSS);
-    return std::stoul(physicalMemoryUsage);
+    return this->_readProcessInfoFile(ProcessStatusInfoLine::RSS);
 }
 
-double ProcessInfo::getCpuTime()
+std::string ProcessInfo::getCpuTime()
 {
     std::ifstream statFile(this->processEntryDirname + "/stat");
     if (!statFile.is_open())
@@ -146,12 +130,12 @@ double ProcessInfo::getCpuTime()
         value.clear();
     }
 
-    return (double)(sysCpuTime + userCpuTime) / CLOCK_PER_MILISECS;
+    return std::to_string((double)(sysCpuTime + userCpuTime) / CLOCK_PER_MILISECS);
 }
 
-float ProcessInfo::getCpuUsage()
+std::string ProcessInfo::getCpuUsage()
 {
-    std::string command = "ps -p " + std::to_string(this->pid) + " -o \%cpu";
+    std::string command = "ps -p " + this->pid + " -o \%cpu";
     FILE *pipe = popen(command.c_str(), "r");
 
     char buffer[BUFFER_SIZE];
@@ -171,43 +155,43 @@ float ProcessInfo::getCpuUsage()
 
     result.pop_back();  // Remove \n character
     result.erase(0, 1); // Remove whitespace character
-
-    return std::stof(result);
+    return result;
 }
 
 // TODO
-double ProcessInfo::getNetworkInBandwidth()
+std::string ProcessInfo::getNetworkInBandwidth()
 {
-    if (this->networkInBandwidth >= 0)
+    if (this->networkInBandwidth.length() == 0)
         return this->networkInBandwidth;
-    return 0;
+    return "";
 }
 
 // TODO
-double ProcessInfo::getNetworkOutBandwidth()
+std::string ProcessInfo::getNetworkOutBandwidth()
 {
-    if (this->networkOutBandwidth >= 0)
+    if (this->networkOutBandwidth.length() == 0)
         return this->networkOutBandwidth;
-    return 0;
+    return "";
 }
 
 // TODO
-ulong ProcessInfo::getIoRead()
+std::string ProcessInfo::getIoRead()
 {
-    if (this->ioRead != ULONG_MAX)
+    if (this->ioRead.length() == 0)
         return this->ioRead;
-    return 0;
+    return "";
 }
 
 // TODO
-ulong ProcessInfo::getIoWrite()
+std::string ProcessInfo::getIoWrite()
 {
-    if (this->ioWrite != ULONG_MAX)
+    if (this->ioWrite.length() == 0)
         return this->ioWrite;
-    return 0;
+    return "";
 }
 
-void printProcessInfo(ProcessInfo* p) {
+void printProcessInfo(ProcessInfo *p)
+{
     std::cout << "Name: " << p->getName() << std::endl;
     std::cout << "Pid: " << p->getPid() << std::endl;
     std::cout << "Parent Pid: " << p->getParentPid() << std::endl;

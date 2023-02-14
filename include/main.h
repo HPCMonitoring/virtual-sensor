@@ -8,5 +8,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <climits>
+#include <vector>
+#include <unordered_map>
 
 #endif
