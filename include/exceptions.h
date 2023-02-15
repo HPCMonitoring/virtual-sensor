@@ -5,12 +5,21 @@
 
 #define ERR_PROCESS_NOT_EXISTS "Process does not exists !"
 #define ERR_INVALID_PID "Invalid process's ID !"
+#define ERR_UNIMPLEMENTED "Unimplemented !"
 
 class ProcessNotExists : public std::exception
 {
     virtual const char *what() const throw()
     {
         return ERR_PROCESS_NOT_EXISTS;
+    }
+};
+
+class Unimplemented : public std::exception
+{
+    virtual const char *what() const throw()
+    {
+        return ERR_UNIMPLEMENTED;
     }
 };
 

@@ -13,28 +13,54 @@ make compile
 Test memory leak:
 
 ```bash
-make check_memory_leak
+make test_memory_leak
 ```
 
-## Coding rules & conventions
+## Project structure
 
-Rules:
+```cpp
+📦include                           // All header files go here
+ ┣ 📜common.h                               // Common typedef, reusable functions and classes
+ ┣ 📜exceptions.h                           // Contain all exception types
+ ┣ 📜kafka_producer.h                       // Kafka producer
+ ┣ 📜main.h                                 // All libaries (standard & 3rd-party) was included here
+ ┣ 📜process.h                              // Process info
+ ┗ 📜sensor.h                               // Sensor
+📦src                               // Implementaion files
+ ┣ 📜main.cpp                               // Program entry
+ ┗ 📜process.cpp                            
+📦.github
+ ┗ 📂workflows                      // CI/CD scripts
+📦test                              // Tests
+📜.gitignore                        // Git ignore file
+📜CMakeLists.txt                    // Project build configurations
+📜Makefile                          // Contains some helpful scripts
+📜README.md
+```
 
-- No unused variables
-- Prefer use const for not modified variables and parameters
-- Unused method must throw "Unimplemented !" exception
+## Coding rules, conventions and considerations
+
+**Rules**:
+
+- **NO** unused variables
+- **NO** hard codes
 - Use header guard when declare a header file and its implementation file
-- NO hard codes
-- Use RAII, not naked pointers
+- Follow [`RAII`](https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization) rules
+- Follow [`Rule of three`](https://en.wikipedia.org/wiki/Rule_of_three_%28C++_programming%29)
+- Unused method must throw `Unimplemented` exception
 
-Conventions:
+**Conventions**:
 
 - Private method should have name with prefix `_`
-- Class name must be in camel case with first letter capitilized `CamelCase`
-- Method name must be in camel case with first letter in lowercase `camelCase`
-- Header guard name must be look like this `__<header name>_H__`
+- Class name must be in `CamelCase` with first letter capitalized
+- Method name must be in `camelCase` with first letter in lowercase
+- Header guard name must be `__CAPITALIZED_SNAKE_CASE__` with prefix & postfix are `__`. Example: `__COMMON_H__`
+- Filename must be in snake case `snake_case`
 
-Remarks:
+**Consider to**:
 
-- Consider use inline function when task has a seperate logic from other bodies of code
+- Use inline function when task has a seperate logic from other bodies of code
+- Use `const` for not modified variables and parameters
+- Use `typedef` to set variable's type a meaningful name
+- Pass by reference for object values
 - Minimalize dependencies as much as possible
