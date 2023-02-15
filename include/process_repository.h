@@ -1,15 +1,35 @@
 #ifndef __PROCESS_REPOSITORY_H__
 #define __PROCESS_REPOSITORY_H__
 
-#include "process.h"
+#include "main.h"
 
-class Sensor
+class ProcessRepository
 {
 private:
-    // Hashmap
-    std::unordered_map<std::string, std::string> clients;
+    ProcessRepository()
+    {
+        std::cout << "Constructor ProcessRepository" << std::endl;
+    }
+
+    ~ProcessRepository()
+    {
+        std::cout << "Destructor ProcessRepository" << std::endl;
+    }
+
+    ProcessRepository(const ProcessRepository &) = delete;
+    ProcessRepository &operator=(const ProcessRepository &) = delete;
+
 public:
-    std::vector<std::string> getProcessInfo(const std::vector<std::string> &);
+    static ProcessRepository &getInstance()
+    {
+        static ProcessRepository instance;
+        return instance;
+    }
+
+    unsigned long long getAddress()
+    {
+        return reinterpret_cast<unsigned long long>(this);
+    }
 };
 
 #endif
