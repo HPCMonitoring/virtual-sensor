@@ -11,5 +11,6 @@
 #include <vector>
 #include <thread>
 #include <unordered_map>
+#include <librdkafka/rdkafkacpp.h>
 
 #endif

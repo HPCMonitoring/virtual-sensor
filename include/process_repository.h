@@ -16,6 +16,7 @@ private:
         std::cout << "Destructor ProcessRepository" << std::endl;
     }
 
+    // Mark as ProcessRepository does not have copy constructor & and cannot assign to another variables
     ProcessRepository(const ProcessRepository &) = delete;
     ProcessRepository &operator=(const ProcessRepository &) = delete;
 
