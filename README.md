@@ -2,6 +2,14 @@
 
 An agent run on each node in HPC system, which is responsible for monitoring & health checking node, push gathered informations to specified `Kafka` topic via configurations.
 
+## Prerequisite
+
+Install [`librdkafka`](https://github.com/confluentinc/librdkafka):
+
+```bash
+sudo apt install librdkafka-dev
+```
+
 ## Some commands
 
 Build to binary:

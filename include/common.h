@@ -3,7 +3,7 @@
 
 #include "main.h"
 
-// List of fields which user want to retrieve and send to kafka
-typedef std::vector<std::string> FilterRule;
+// Using SQL to specified which user want to retrieve and send to kafka
+typedef std::string FilterRule;
 
 #endif

@@ -6,6 +6,7 @@
 #define ERR_PROCESS_NOT_EXISTS "Process does not exists !"
 #define ERR_INVALID_PID "Invalid process's ID !"
 #define ERR_UNIMPLEMENTED "Unimplemented !"
+#define ERR_CREATE_PRODUCER "Failed to create kafka producer"
 
 class ProcessNotExists : public std::exception
 {

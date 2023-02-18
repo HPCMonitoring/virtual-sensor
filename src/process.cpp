@@ -161,33 +161,25 @@ std::string ProcessInfo::getCpuUsage()
 // TODO
 std::string ProcessInfo::getNetworkInBandwidth()
 {
-    if (this->networkInBandwidth.length() == 0)
-        return this->networkInBandwidth;
-    return "";
+    throw Unimplemented();
 }
 
 // TODO
 std::string ProcessInfo::getNetworkOutBandwidth()
 {
-    if (this->networkOutBandwidth.length() == 0)
-        return this->networkOutBandwidth;
-    return "";
+    throw Unimplemented();
 }
 
 // TODO
 std::string ProcessInfo::getIoRead()
 {
-    if (this->ioRead.length() == 0)
-        return this->ioRead;
-    return "";
+    throw Unimplemented();
 }
 
 // TODO
 std::string ProcessInfo::getIoWrite()
 {
-    if (this->ioWrite.length() == 0)
-        return this->ioWrite;
-    return "";
+    throw Unimplemented();
 }
 
 void printProcessInfo(ProcessInfo *p)
