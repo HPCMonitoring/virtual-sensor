@@ -7,61 +7,61 @@
 class MessageProducer
 {
 public:
-    class TopicWithFilterRule;
+    class Worker;
 
 private:
-    RdKafka::Producer* producer;
-    RdKafka::Conf* conf;
-    std::unordered_map<std::string, TopicWithFilterRule*> topics;
-    MessageProducer(const MessageProducer&) = delete;
+    RdKafka::Producer *producer;
+    // Hashmap topic name -> worker
+    std::unordered_map<std::string, Worker *> workers;
+    MessageProducer(const MessageProducer &) = delete;
 
 public:
     MessageProducer(const std::string &clientId, const std::string &brokerUrl);
-    void addTopic(const std::string &topicName, const FilterRule &filterRule, time_t interval);
-    void removeTopic(const std::string &topicName);
-    void updateTopic(const std::string &topicName, const FilterRule &filterRule, time_t interval);
+    Worker *createWorker(const std::string &topicName, const FilterRule &filterRule, const time_t interval);
+    void removeWorker(const std::string &topicName);
+    Worker *getWorker(const std::string &topicName);
     ~MessageProducer();
-    void send(const std::string &topicName, const std::string&);
 
 public:
-    class TopicWithFilterRule
+    class Worker
     {
     private:
-        RdKafka::Topic* topic;
+        RdKafka::Producer *handler;
+        RdKafka::Topic *topic;
+        std::string topicName;
         FilterRule filterRule;
         time_t interval;
+        std::thread job;
+
     private:
-        TopicWithFilterRule(RdKafka::Topic* topic) {
+        Worker(RdKafka::Topic *topic, RdKafka::Producer *handler)
+        {
             this->topic = topic;
+            this->handler = handler;
         };
+        Worker(const Worker &) = delete;
+        Worker &operator=(const Worker &) = delete;
+        void _sendMessage(const std::string &msg)
+        {
+            this->handler->produce(this->topic,
+                                   RdKafka::Topic::PARTITION_UA,
+                                   RdKafka::Producer::RK_MSG_COPY,
+                                   const_cast<char *>(msg.c_str()),
+                                   msg.size(),
+                                   NULL, // Key
+                                   0, // Key length
+                                   NULL); // Opaque value
+        }
+
     public:
-        static MessageProducer::TopicWithFilterRule* build(RdKafka::Producer* producer, const std::string& topicName)
-        {
-            std::string errMsg;
-            RdKafka::Topic* rawTopic = RdKafka::Topic::create(producer, topicName, NULL, errMsg);
-            MessageProducer::TopicWithFilterRule* topic = new TopicWithFilterRule(rawTopic);
-            return topic;
-        }
-
-        MessageProducer::TopicWithFilterRule* buildFilterRule(const FilterRule& filterRule) {
-            this->filterRule = filterRule;
-            return this;
-        }
-
-        MessageProducer::TopicWithFilterRule* buildTimeInterval(const time_t interval) {
-            this->interval = interval;
-            return this;
-        }
-
-        // Return a modifiable reference of filter rule
-        FilterRule *getFilterRule()
-        {
-            return &this->filterRule;
-        }
-        time_t getInterval()
-        {
-            return this->interval;
-        }
+        static Worker *buildTopic(RdKafka::Producer *producer, const std::string &topicName);
+        Worker *buildFilterRule(const FilterRule &filterRule);
+        Worker *buildTimeInterval(const time_t interval);
+        Worker *build();
+        FilterRule *getFilterRule();
+        time_t getInterval();
+        
+        ~Worker();
     };
 };
 

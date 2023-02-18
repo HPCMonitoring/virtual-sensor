@@ -19,10 +19,10 @@ private:
 
 public:
     Sensor(const std::string& credentialStorePath);
-    MessageProducer* addKafkaProducer(const std::string &brokerUrl, const std::string &clientId);
-    void removeKafkaProducer(const std::string &brokerUrl);
-    MessageProducer* getKafkaProducer(const std::string &brokerUrl);
-    void connectToSensorManagerServer();
+    MessageProducer* createMsgProducer(const std::string &brokerUrl, const std::string &clientId);
+    void removeMsgProducer(const std::string &brokerUrl);
+    MessageProducer* getMsgProducer(const std::string &brokerUrl);
+    void connect();
     ~Sensor();
 };
 

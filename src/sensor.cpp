@@ -11,34 +11,33 @@ Sensor::~Sensor()
 {
     for (std::unordered_map<std::string, MessageProducer *>::iterator i = this->kafkaProducers.begin(); i != this->kafkaProducers.end(); i++)
     {
-        std::cout << i->first << std::endl;
         delete i->second;
     }
 }
 
-MessageProducer *Sensor::addKafkaProducer(const std::string &brokerUrl, const std::string &clientId)
+MessageProducer *Sensor::createMsgProducer(const std::string &clientId, const std::string &brokerUrl)
 {
     MessageProducer *producer = new MessageProducer(clientId, brokerUrl);
     this->kafkaProducers.insert({brokerUrl, producer});
     return producer;
 }
 
-void Sensor::removeKafkaProducer(const std::string &brokerUrl)
+void Sensor::removeMsgProducer(const std::string &brokerUrl)
 {
     MessageProducer *producer = this->kafkaProducers.at(brokerUrl);
     this->kafkaProducers.erase(brokerUrl);
     delete producer;
 }
 
-MessageProducer *Sensor::getKafkaProducer(const std::string &brokerUrl)
+MessageProducer *Sensor::getMsgProducer(const std::string &brokerUrl)
 {
     return this->kafkaProducers.at(brokerUrl);
 }
 
-void Sensor::connectToSensorManagerServer()
+void Sensor::connect()
 {
     std::cout << "Connecting to sensor manager server ..." << std::endl;
-    sleep(500);
+    sleep(1);
     std::cout << "Connected successfully !" << std::endl;
 }
 

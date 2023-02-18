@@ -8,7 +8,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <climits>
-#include <vector>
 #include <thread>
 #include <unordered_map>
 #include <librdkafka/rdkafkacpp.h>
