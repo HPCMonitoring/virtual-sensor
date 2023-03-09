@@ -72,3 +72,17 @@ make test_memory_leak
 - Use `typedef` to set variable's type a meaningful name
 - Pass by reference for object values
 - Minimalize dependencies as much as possible
+
+## Testing tools
+
+To host a kafka server in local (default port 9092), run:
+
+```bash
+docker-compose up -d
+```
+
+To start a kafka consumer for testing, run:
+
+```bash
+cd checktools && ./consumer config.ini
+```

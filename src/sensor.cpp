@@ -2,9 +2,9 @@
 
 #ifdef __SENSOR_H__
 
-Sensor::Sensor(const std::string &credentialStorePath)
+Sensor::Sensor(const std::string &managerServerUrl)
 {
-    std::cout << "Load credential from " << credentialStorePath << std::endl;
+    this->managerUrl = managerServerUrl;
 }
 
 Sensor::~Sensor()
@@ -36,7 +36,7 @@ MessageProducer *Sensor::getMsgProducer(const std::string &brokerUrl)
 
 void Sensor::connect()
 {
-    std::cout << "Connecting to sensor manager server ..." << std::endl;
+    std::cout << "Connecting to sensor manager server: " << this->managerUrl << std::endl;
     sleep(1);
     std::cout << "Connected successfully !" << std::endl;
 }

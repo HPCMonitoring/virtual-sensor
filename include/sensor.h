@@ -14,12 +14,13 @@ private:
     std::string name;
     std::string cluster;
     std::string token;
+    std::string managerUrl;
 private:
     Sensor(const Sensor&) = delete;
 
 public:
     Sensor(const std::string& credentialStorePath);
-    MessageProducer* createMsgProducer(const std::string &brokerUrl, const std::string &clientId);
+    MessageProducer* createMsgProducer(const std::string &clientId, const std::string &brokerUrl);
     void removeMsgProducer(const std::string &brokerUrl);
     MessageProducer* getMsgProducer(const std::string &brokerUrl);
     void connect();
