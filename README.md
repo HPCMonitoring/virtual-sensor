@@ -10,6 +10,11 @@ Install [`librdkafka`](https://github.com/confluentinc/librdkafka):
 sudo apt install librdkafka-dev
 ```
 
+Install [`spdlog`](https://github.com/gabime/spdlog):
+```bash
+sudo apt install libspdlog-dev
+```
+
 ## Some commands
 
 Build to binary:
