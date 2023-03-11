@@ -2,3 +2,4 @@ build
 vsensor
 .vscode
 *.txt
+logs
