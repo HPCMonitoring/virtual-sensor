@@ -1,6 +1,5 @@
-compile:
+all:
 	mkdir -p build && cd build && cmake .. && cmake --build . && cp ./vsensor ../vsensor
-
 test_memory_leak:
 	valgrind -s --tool=memcheck ./vsensor
 clean_git:
