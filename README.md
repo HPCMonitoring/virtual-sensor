@@ -84,7 +84,7 @@ docker-compose up -d
 Create a topic named `purchases`:
 
 ```bash
-docker compose exec broker \
+docker-compose exec broker \
   kafka-topics --create \
     --topic purchases \
     --bootstrap-server localhost:9092 \

@@ -42,7 +42,6 @@ private:
 public:
     ProcessInfo(pid_t);
     std::string getName();
-
     std::string getPid();
     std::string getParentPid();
     std::string getUid();
@@ -58,6 +57,7 @@ public:
     std::string getNetworkOutBandwidth();
     std::string getIoWrite();
     std::string getIoRead();
+    void print() ;
 
 private:
     std::string _readProcessInfoFile(const ProcessStatusInfoLine lineNumber)
@@ -103,7 +103,5 @@ private:
         return line;
     }
 };
-
-void printProcessInfo(ProcessInfo *);
 
 #endif
