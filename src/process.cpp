@@ -1,8 +1,6 @@
 #include "process.h"
 #include "exceptions.h"
 
-#ifdef __PROCESS_H__
-
 inline bool fileExists(const std::string &name)
 {
     struct stat buffer;
@@ -196,5 +194,3 @@ void printProcessInfo(ProcessInfo *p)
     std::cout << "Execute path: " << p->getExecutePath() << std::endl;
     std::cout << "Command: " << p->getCommand() << std::endl;
 }
-
-#endif

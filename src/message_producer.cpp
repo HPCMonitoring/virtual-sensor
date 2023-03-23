@@ -1,6 +1,5 @@
 #include "message_producer.h"
 #include "exceptions.h"
-#ifdef __MESSAGE_PRODUCER_H__
 
 MessageProducer::MessageProducer(const std::string &clientId, const std::string &brokerUrl)
 {
@@ -94,5 +93,3 @@ MessageProducer::Worker::~Worker()
 {
     delete this->topic;
 }
-
-#endif

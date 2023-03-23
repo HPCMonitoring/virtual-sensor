@@ -1,7 +1,5 @@
 #include "sensor.h"
 
-#ifdef __SENSOR_H__
-
 Sensor::Sensor(const std::string &managerServerUrl)
 {
     this->managerUrl = managerServerUrl;
@@ -40,5 +38,3 @@ void Sensor::connect()
     sleep(1);
     std::cout << "Connected successfully !" << std::endl;
 }
-
-#endif
