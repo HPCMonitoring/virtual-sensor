@@ -47,7 +47,7 @@ void MessageProducer::removeWorker(const std::string &topicName)
     this->workers.erase(topicName);
 }
 
-MessageProducer::Worker *MessageProducer::getWorker(const std::string &topicName)
+MessageProducer::Worker *MessageProducer::getWorker(const std::string &topicName) const
 {
     return this->workers.at(topicName);
 }
@@ -75,7 +75,7 @@ MessageProducer::Worker *MessageProducer::Worker::buildTimeInterval(const time_t
 
 MessageProducer::Worker *MessageProducer::Worker::build()
 {
-    this->_sendMessage("Hello world !");
+    this->job = std::thread(&MessageProducer::Worker::_sendMessage, this, "Hello world !");
     return this;
 }
 
@@ -91,5 +91,8 @@ time_t MessageProducer::Worker::getInterval()
 
 MessageProducer::Worker::~Worker()
 {
+    // Gracefully terminate program
+    this->stopFlag = true;
+    this->job.join();
     delete this->topic;
 }

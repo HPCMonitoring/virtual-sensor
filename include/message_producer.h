@@ -19,7 +19,7 @@ public:
     MessageProducer(const std::string &clientId, const std::string &brokerUrl);
     Worker *createWorker(const std::string &topicName, const FilterRule &filterRule, const time_t interval);
     void removeWorker(const std::string &topicName);
-    Worker *getWorker(const std::string &topicName);
+    Worker *getWorker(const std::string &topicName) const;
     ~MessageProducer();
 
 public:
@@ -32,25 +32,32 @@ public:
         FilterRule filterRule;
         time_t interval;
         std::thread job;
+        std::atomic<bool> stopFlag;
 
     private:
         Worker(RdKafka::Topic *topic, RdKafka::Producer *handler)
         {
             this->topic = topic;
             this->handler = handler;
+            this->stopFlag = false;
         };
         Worker(const Worker &) = delete;
         Worker &operator=(const Worker &) = delete;
         void _sendMessage(const std::string &msg)
         {
-            this->handler->produce(this->topic,
-                                   RdKafka::Topic::PARTITION_UA,
-                                   RdKafka::Producer::RK_MSG_COPY,
-                                   const_cast<char *>(msg.c_str()),
-                                   msg.size(),
-                                   NULL, // Key
-                                   0, // Key length
-                                   NULL); // Opaque value
+            while (stopFlag == false)
+            {
+                /* code */
+                this->handler->produce(this->topic,
+                                       RdKafka::Topic::PARTITION_UA,
+                                       RdKafka::Producer::RK_MSG_COPY,
+                                       const_cast<char *>(msg.c_str()),
+                                       msg.size(),
+                                       NULL,  // Key
+                                       0,     // Key length
+                                       NULL); // Opaque value
+                sleep(this->interval);
+            }
         }
 
     public:
@@ -60,7 +67,7 @@ public:
         Worker *build();
         FilterRule *getFilterRule();
         time_t getInterval();
-        
+
         ~Worker();
     };
 };
