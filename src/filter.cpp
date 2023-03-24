@@ -39,12 +39,10 @@ LogicalExpr::~LogicalExpr()
     for (size_t i = 0; i < this->subExprs.size(); ++i)
     {
         delete this->subExprs[i];
-        this->subExprs[i] = nullptr;
     }
-    this->subExprs.clear();
 }
 
-Filter::Filter(const std::string &datatype, const std::string &fields, const std::string &conditions)
+Filter::Filter(const std::string &datatype, const std::string &fields, const std::string &whereCondition)
 {
     this->datatype = datatype;
 
@@ -53,7 +51,7 @@ Filter::Filter(const std::string &datatype, const std::string &fields, const std
     while (issFields >> temp)
         this->fields.push_back(temp);
 
-    std::istringstream issLexicals(conditions);
+    std::istringstream issLexicals(whereCondition);
     std::stack<Expr *> exprStack;
     std::stack<std::string> lexicalStack;
 
@@ -97,8 +95,9 @@ Filter::Filter(const std::string &datatype, const std::string &fields, const std
         }
     }
 
-    this->conditions = exprStack.top();
+    this->whereCondition = exprStack.top();
     exprStack.pop();
+    std::cout << "Stack size: " << exprStack.size() << '\n';
 }
 void Filter::print()
 {
@@ -113,10 +112,10 @@ void Filter::print()
     std::cout << '>' << std::endl;
 
     std::cout << "Conditions: ";
-    this->conditions->print();
+    this->whereCondition->print();
     std::cout << std::endl;
 }
 Filter::~Filter()
 {
-    delete this->conditions;
+    delete this->whereCondition;
 }

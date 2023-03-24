@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
     // MessageProducer producer("1915940", "localhost:9092");
     // producer.createWorker("purchases", "", 5);
 
-    Filter filter("process-info", "id name", "|| 2 == uid 10 < cpu 20");
+    Filter filter("process-info", "id name", "&& 3 == id 5 < memory 70 || 2 == uid 10 < cpu 20");
     filter.print();
 
     // while (true);

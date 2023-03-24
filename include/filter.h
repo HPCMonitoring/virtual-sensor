@@ -20,6 +20,7 @@ protected:
 public:
     virtual bool check() = 0;
     virtual void print() = 0;
+    virtual ~Expr(){};
 };
 
 class RelationalExpr : public Expr
@@ -50,15 +51,16 @@ public:
 
 class Filter
 {
+public:
     std::string datatype;
     std::vector<std::string> fields;
-    Expr *conditions;
+    Expr *whereCondition;
 
 private:
     Filter();
 
 public:
-    Filter(const std::string &datatype, const std::string &fields, const std::string &conditions);
+    Filter(const std::string &datatype, const std::string &fields, const std::string &whereCondition);
     void print();
     ~Filter();
 };
