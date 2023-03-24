@@ -30,10 +30,10 @@ MessageProducer::~MessageProducer()
     delete this->producer;
 }
 
-MessageProducer::Worker *MessageProducer::createWorker(const std::string &topicName, const FilterRule &filterRule, const time_t interval)
+MessageProducer::Worker *MessageProducer::createWorker(const std::string &topicName, Filter* filter, const time_t interval)
 {
     MessageProducer::Worker *worker = MessageProducer::Worker::buildTopic(this->producer, topicName)
-                                          ->buildFilterRule(filterRule)
+                                          ->buildFilter(filter)
                                           ->buildTimeInterval(interval)
                                           ->build();
     this->workers.insert({topicName, worker});
@@ -61,9 +61,9 @@ MessageProducer::Worker *MessageProducer::Worker::buildTopic(RdKafka::Producer *
     return topic;
 }
 
-MessageProducer::Worker *MessageProducer::Worker::buildFilterRule(const FilterRule &filterRule)
+MessageProducer::Worker *MessageProducer::Worker::buildFilter(Filter* filter)
 {
-    this->filterRule = filterRule;
+    this->filter = filter;
     return this;
 }
 
@@ -79,9 +79,9 @@ MessageProducer::Worker *MessageProducer::Worker::build()
     return this;
 }
 
-FilterRule *MessageProducer::Worker::getFilterRule()
+Filter *MessageProducer::Worker::getFilter()
 {
-    return &this->filterRule;
+    return this->filter;
 }
 
 time_t MessageProducer::Worker::getInterval()

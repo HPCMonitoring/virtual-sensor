@@ -3,6 +3,7 @@
 
 #include "main.h"
 #include "common.h"
+#include "filter.h"
 
 class MessageProducer
 {
@@ -17,7 +18,7 @@ private:
 
 public:
     MessageProducer(const std::string &clientId, const std::string &brokerUrl);
-    Worker *createWorker(const std::string &topicName, const FilterRule &filterRule, const time_t interval);
+    Worker *createWorker(const std::string &topicName, Filter* filter, const time_t interval);
     void removeWorker(const std::string &topicName);
     Worker *getWorker(const std::string &topicName) const;
     ~MessageProducer();
@@ -29,7 +30,7 @@ public:
         RdKafka::Producer *handler;
         RdKafka::Topic *topic;
         std::string topicName;
-        FilterRule filterRule;
+        Filter* filter;
         time_t interval;
         std::thread job;
         std::atomic<bool> stopFlag;
@@ -62,10 +63,10 @@ public:
 
     public:
         static Worker *buildTopic(RdKafka::Producer *producer, const std::string &topicName);
-        Worker *buildFilterRule(const FilterRule &filterRule);
+        Worker *buildFilter(Filter*);
         Worker *buildTimeInterval(const time_t interval);
         Worker *build();
-        FilterRule *getFilterRule();
+        Filter *getFilter();
         time_t getInterval();
 
         ~Worker();
