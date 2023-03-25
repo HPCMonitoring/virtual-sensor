@@ -32,12 +32,19 @@ MessageProducer::~MessageProducer()
 
 MessageProducer::Worker *MessageProducer::createWorker(const std::string &topicName, Filter* filter, const time_t interval)
 {
-    MessageProducer::Worker *worker = MessageProducer::Worker::buildTopic(this->producer, topicName)
-                                          ->buildFilter(filter)
-                                          ->buildTimeInterval(interval)
-                                          ->build();
+    MessageProducer::Worker *worker = new MessageProducer::Worker(producer, topicName, filter, interval);
     this->workers.insert({topicName, worker});
     return worker;
+}
+
+MessageProducer::Worker::Worker(RdKafka::Producer *handler, const std::string &topicName, Filter *filter, const time_t interval) {
+    std::string errMsg;
+    RdKafka::Topic *topic = RdKafka::Topic::create(handler, topicName, NULL, errMsg);
+    this->topic = topic;
+    this->topicName = topicName;
+    this->filter = filter;
+    this->interval = interval;
+    this->job = std::thread(&MessageProducer::Worker::_sendMessage, this, "Hello world !");
 }
 
 void MessageProducer::removeWorker(const std::string &topicName)
@@ -50,33 +57,6 @@ void MessageProducer::removeWorker(const std::string &topicName)
 MessageProducer::Worker *MessageProducer::getWorker(const std::string &topicName) const
 {
     return this->workers.at(topicName);
-}
-
-MessageProducer::Worker *MessageProducer::Worker::buildTopic(RdKafka::Producer *producer, const std::string &topicName)
-{
-    std::string errMsg;
-    RdKafka::Topic *rawTopic = RdKafka::Topic::create(producer, topicName, NULL, errMsg);
-    MessageProducer::Worker *topic = new Worker(rawTopic, producer);
-    topic->topicName = topicName;
-    return topic;
-}
-
-MessageProducer::Worker *MessageProducer::Worker::buildFilter(Filter* filter)
-{
-    this->filter = filter;
-    return this;
-}
-
-MessageProducer::Worker *MessageProducer::Worker::buildTimeInterval(const time_t interval)
-{
-    this->interval = interval;
-    return this;
-}
-
-MessageProducer::Worker *MessageProducer::Worker::build()
-{
-    this->job = std::thread(&MessageProducer::Worker::_sendMessage, this, "Hello world !");
-    return this;
 }
 
 Filter *MessageProducer::Worker::getFilter()

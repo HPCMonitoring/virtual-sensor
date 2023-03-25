@@ -18,7 +18,7 @@ private:
 
 public:
     MessageProducer(const std::string &clientId, const std::string &brokerUrl);
-    Worker *createWorker(const std::string &topicName, Filter* filter, const time_t interval);
+    Worker *createWorker(const std::string &topicName, Filter *filter, const time_t interval);
     void removeWorker(const std::string &topicName);
     Worker *getWorker(const std::string &topicName) const;
     ~MessageProducer();
@@ -30,20 +30,18 @@ public:
         RdKafka::Producer *handler;
         RdKafka::Topic *topic;
         std::string topicName;
-        Filter* filter;
+        Filter *filter;
         time_t interval;
         std::thread job;
         std::atomic<bool> stopFlag;
 
+    public:
+        Worker(RdKafka::Producer *, const std::string &, Filter *, const time_t );
+        Filter *getFilter();
+        time_t getInterval();
+        ~Worker();
+
     private:
-        Worker(RdKafka::Topic *topic, RdKafka::Producer *handler)
-        {
-            this->topic = topic;
-            this->handler = handler;
-            this->stopFlag = false;
-        };
-        Worker(const Worker &) = delete;
-        Worker &operator=(const Worker &) = delete;
         void _sendMessage(const std::string &msg)
         {
             while (stopFlag == false)
@@ -60,16 +58,6 @@ public:
                 sleep(this->interval);
             }
         }
-
-    public:
-        static Worker *buildTopic(RdKafka::Producer *producer, const std::string &topicName);
-        Worker *buildFilter(Filter*);
-        Worker *buildTimeInterval(const time_t interval);
-        Worker *build();
-        Filter *getFilter();
-        time_t getInterval();
-
-        ~Worker();
     };
 };
 
