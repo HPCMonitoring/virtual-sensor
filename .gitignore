@@ -4,3 +4,5 @@ vsensor
 *.txt
 logs
 wsconfig.json
+cmake-build-debug
+.idea
