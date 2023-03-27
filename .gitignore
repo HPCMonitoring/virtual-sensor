@@ -3,3 +3,4 @@ vsensor
 .vscode
 *.txt
 logs
+wsconfig.json
