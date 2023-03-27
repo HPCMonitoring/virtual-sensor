@@ -1,6 +1,5 @@
 {
   "auth_token": "hpc-monitoring-sensor",
-  "id": "clfdpldmt0001x7fu0pukbcfa",
   "cluster": "BK HPC Laboratory",
   "name": "NhanCu Laptop1",
   "server": "localhost:8080"
