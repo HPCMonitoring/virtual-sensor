@@ -15,6 +15,14 @@ Install [`spdlog`](https://github.com/gabime/spdlog):
 sudo apt install libspdlog-dev
 ```
 
+Install [`ixwebsocket`](https://machinezone.github.io/IXWebSocket/build/)
+```bash
+cd IXWebSocket
+cmake -DBUILD_SHARED_LIBS=ON
+make -j
+make install
+```
+
 ## Some commands
 
 Build to binary:
