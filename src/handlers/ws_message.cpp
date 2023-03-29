@@ -9,14 +9,18 @@ WsMessage::~WsMessage() {
 
 std::string WsMessage::toJson() const {
     auto format = boost::format("{"
-                                "message: %s, "
-                                "error: %d, "
-                                "payload: %s,"
+                                "\"cmd\": %d,"
+                                "\"message\": \"%s\", "
+                                "\"error\": %d, "
+                                "\"coordId\": \"%s\","
+                                "\"payload\": %s"
                                 "}");
     return boost::str(
             format %
+            this->cmd %
             this->msg %
             this->error %
+            this->coordId %
             this->payload->toJson()
     );
 }

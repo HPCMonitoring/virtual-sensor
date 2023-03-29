@@ -60,11 +60,13 @@ void SensorManagerClient::on_message(const ix::WebSocketMessagePtr &msg)
     json msgJson = json::parse(msg->str);
     try
     {
-        const int cmd = msgJson["cmd"].get<int>();
+        const auto cmd = msgJson["cmd"].get<WsCommand>();
         if (_fmap.count(cmd) > 0) {
             WsMessage message;
+            message.cmd = cmd;
             message.msg = msgJson.contains("message") ? msgJson["message"].get<std::string>() : "";
             message.error = msgJson.contains("error") ? msgJson["error"].get<int>() : 0;
+            message.coordId = msgJson.contains("coordId") ? msgJson["coordId"].get<std::string>() : "";
             auto *plainJsonStr = new PlainJsonStr( msgJson["payload"].dump());
             message.payload = plainJsonStr;
             _fmap.at(cmd)->handle(this, message);
@@ -133,40 +135,37 @@ SensorManagerClient::~SensorManagerClient()
 
 void SensorManagerClient::run()
 {
-    while (true)
+    std::string uri = this->buildConnStr();
+    _webSocket.setUrl(uri);
+    ix::WebSocketHttpHeaders headers;
+    headers["authorization"] = this->_config["auth_token"];
+    _webSocket.setExtraHeaders(headers);
+    _webSocket.setOnMessageCallback([this](const ix::WebSocketMessagePtr &msg)
+                                    {
+           switch (msg->type) {
+               case ix::WebSocketMessageType::Message:
+                   this->on_message(msg);
+                   break;
+               case ix::WebSocketMessageType::Open:
+                   on_open(msg);
+                   break;
+               case ix::WebSocketMessageType::Close:
+                   on_close(msg);
+                   break;
+               case ix::WebSocketMessageType::Error:
+                   on_error(msg);
+                   break;
+               default:
+                   break;
+           } });
+    _webSocket.setPingInterval(5);
+    try
     {
-        std::string uri = this->buildConnStr();
-        _webSocket.setUrl(uri);
-        ix::WebSocketHttpHeaders headers;
-        headers["authorization"] = this->_config["auth_token"];
-        _webSocket.setExtraHeaders(headers);
-        _webSocket.setOnMessageCallback([this](const ix::WebSocketMessagePtr &msg)
-                                        {
-               switch (msg->type) {
-                   case ix::WebSocketMessageType::Message:
-                       this->on_message(msg);
-                       break;
-                   case ix::WebSocketMessageType::Open:
-                       on_open(msg);
-                       break;
-                   case ix::WebSocketMessageType::Close:
-                       on_close(msg);
-                       break;
-                   case ix::WebSocketMessageType::Error:
-                       on_error(msg);
-                       break;
-               } });
-
-        try
-        {
-            _webSocket.run();
-        }
-        catch (std::exception &e)
-        {
-            SPDLOG_LOGGER_INFO(this->_logger, std::string("Error in run websocket client with message: ").append(e.what()));
-        }
-
-        SPDLOG_LOGGER_INFO(this->_logger, std::string("Start re-connect in ").append(std::to_string(this->_nextConnRetry)).append(" secs"));
-        std::this_thread::sleep_for(std::chrono::seconds(this->_nextConnRetry));
+        _webSocket.run();
     }
+    catch (std::exception &e)
+    {
+        SPDLOG_LOGGER_INFO(this->_logger, std::string("Error in run websocket client with message: ").append(e.what()));
+    }
+
 }
