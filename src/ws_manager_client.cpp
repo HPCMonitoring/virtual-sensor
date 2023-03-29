@@ -12,6 +12,7 @@ SensorManagerClient::SensorManagerClient()
     this->_logger = SensorLogger::getInstance()->getLogger();
     // TODO: must replace periodically retry by fibonacci retry approach
     this->_nextConnRetry = 10;
+    this->_stopFlag = false;
     std::ifstream f(CONF_F_NAME);
     if (f.is_open())
 
@@ -110,8 +111,15 @@ void SensorManagerClient::on_close(const ix::WebSocketMessagePtr &msg)
 
 void SensorManagerClient::setupAndStart()
 {
-    std::thread thread_obj(&SensorManagerClient::run, this);
-    thread_obj.join();
+    while(!this->_stopFlag) {
+        std::thread thread_obj(&SensorManagerClient::run, this);
+        thread_obj.join();
+        SPDLOG_LOGGER_INFO(
+            this->_logger,
+            boost::str(boost::format("websocket client run done and start re-run in next %d sec") % this->_nextConnRetry));
+        std::this_thread::sleep_for (std::chrono::seconds(this->_nextConnRetry));
+    }
+
 }
 
 void SensorManagerClient::send(const WsMessage &res)
@@ -158,10 +166,12 @@ void SensorManagerClient::run()
                default:
                    break;
            } });
+    _webSocket.disableAutomaticReconnection();
     _webSocket.setPingInterval(5);
     try
     {
         _webSocket.run();
+        _webSocket.close();
     }
     catch (std::exception &e)
     {

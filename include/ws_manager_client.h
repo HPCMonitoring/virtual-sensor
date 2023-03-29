@@ -21,6 +21,7 @@ private:
     std::unordered_map<int, CmdHandler*> _fmap;
     std::shared_ptr<spdlog::logger> _logger;
     json _config;
+    std::atomic<bool> _stopFlag;
     int _nextConnRetry;
     ix::WebSocket _webSocket;
     void run();
