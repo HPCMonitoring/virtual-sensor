@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     attrs.push_back(Attribute("command", "cmd"));
 
     const Filter filter(PROCESS, attrs, "&& 2 == pid 1 || 2 == uid 10 < cpu 20");
-    Repository& r = Repository::getInstance();
+    Repository &r = Repository::getInstance();
     std::cout << r.getData(filter) << std::endl;
 
     // while (true);

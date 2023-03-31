@@ -3,7 +3,6 @@
 
 #include "main.h"
 #include "process.h"
-#include "common.h"
 #include "message_producer.h"
 
 class Sensor

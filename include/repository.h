@@ -5,6 +5,10 @@
 #include "filter.h"
 #include "process.h"
 
+#define PROC_FS "/proc"
+
+bool isProcessDirectory(const std::string& name);
+
 class Repository
 {
 private:
@@ -15,12 +19,35 @@ private:
     Repository &operator=(const Repository &) = delete;
 
 public:
-    static Repository &getInstance()
+    static Repository &getInstance();
+    std::string getData(const Filter &);
+
+public:
+    std::vector<pid_t> getAllPids()
     {
-        static Repository instance;
-        return instance;
+        std::vector<pid_t> pids;
+
+        DIR *procDir = opendir(PROC_FS); // Open the /proc directory
+        if (!procDir)
+        {
+            std::cerr << "Error: could not open /proc directory\n";
+            return pids;
+        }
+
+        dirent *entry = readdir(procDir);
+        while (entry != NULL)
+        {
+            std::string name = entry->d_name;
+            if (entry->d_type == DT_DIR && isProcessDirectory(name))
+            {
+                const pid_t pid = std::atoi(name.c_str());
+                pids.push_back(pid);
+            }
+            entry = readdir(procDir);
+        }
+        closedir(procDir);
+        return pids;
     }
-    std::string getData(const Filter&);
 };
 
 #endif

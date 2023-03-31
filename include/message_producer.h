@@ -2,7 +2,6 @@
 #define __MESSAGE_PRODUCER_H__
 
 #include "main.h"
-#include "common.h"
 #include "filter.h"
 
 class MessageProducer

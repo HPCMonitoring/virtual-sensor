@@ -14,5 +14,6 @@
 #include <csignal>
 #include <unordered_map>
 #include <librdkafka/rdkafkacpp.h>
+#include <dirent.h>
 
 #endif
