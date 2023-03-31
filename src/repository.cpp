@@ -33,6 +33,16 @@ std::string Repository::getData(const Filter &filter)
             Process proc(pid);
             result.append(proc.toJsonStr(filter.attrs));
         }
+        else {
+            std::vector<pid_t> allPids = this->getAllPids();
+            const size_t numOfProcesses = allPids.size();
+            for(size_t i = 0; i < numOfProcesses; ++i) {
+                Process proc(allPids.at(i));
+                result.append(proc.toJsonStr(filter.attrs));
+                if(i != numOfProcesses - 1 )
+                    result.push_back(',');
+            }
+        }
     }
     result.push_back(']');
     return result;
