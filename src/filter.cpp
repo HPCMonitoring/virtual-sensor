@@ -42,7 +42,14 @@ LogicalExpr::~LogicalExpr()
     }
 }
 
-Filter::Filter(const std::string &datatype, const std::vector<Attribute>& attrs, const std::string &whereCondition)
+Filter::Filter(const std::string &datatype, const std::vector<Attribute> &attrs)
+{
+    this->datatype = datatype;
+    this->attrs = attrs;
+    this->whereCondition = nullptr;
+}
+
+Filter::Filter(const std::string &datatype, const std::vector<Attribute> &attrs, const std::string &whereCondition)
 {
     this->datatype = datatype;
     this->attrs = attrs;
@@ -103,7 +110,7 @@ inline void Filter::print()
     std::cout << this->attrs.at(0).name << "as" << this->attrs.at(0).alias;
     for (size_t i = 1; i < this->attrs.size(); ++i)
     {
-        std::cout << ", " <<  this->attrs.at(i).name << "as" << this->attrs.at(i).alias;
+        std::cout << ", " << this->attrs.at(i).name << "as" << this->attrs.at(i).alias;
     }
     std::cout << '>' << std::endl;
 

@@ -18,10 +18,12 @@ int main(int argc, char *argv[])
     attrs.push_back(Attribute("executePath", "execPath"));
     attrs.push_back(Attribute("command", "cmd"));
 
-    const Filter filter(PROCESS, attrs, "&& 2 == pid 1 || 2 == uid 10 < cpu 20");
+    // const Filter filter(PROCESS, attrs, "&& 2 == pid 1 || 2 == uid 10 < cpu 20");
+    const Filter filter(PROCESS, attrs, "== pid 3727");
     Repository &r = Repository::getInstance();
-    std::cout << r.getData(filter) << std::endl;
-
+    std::ofstream out("data.json");
+    out << r.getData(filter);
+    out.close();
     // while (true);
     return 0;
 }

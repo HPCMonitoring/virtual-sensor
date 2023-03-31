@@ -26,7 +26,7 @@ std::string Repository::getData(const Filter &filter)
 
     if (filter.datatype == PROCESS)
     {
-        const std::string pidLiteral = filter.whereCondition->findPid();
+        const std::string pidLiteral = filter.whereCondition != nullptr ? filter.whereCondition->findPid() : "";
         if (pidLiteral.length() > 0)
         {
             const pid_t pid = std::stoi(pidLiteral);

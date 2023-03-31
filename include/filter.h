@@ -93,6 +93,7 @@ private:
     Filter();
 
 public:
+    Filter(const std::string &datatype, const std::vector<Attribute> &attrs);
     Filter(const std::string &datatype, const std::vector<Attribute> &attrs, const std::string &whereCondition);
     void print();
     ~Filter();
