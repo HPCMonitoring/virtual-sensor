@@ -159,25 +159,26 @@ std::string Process::getCpuUsage()
 // TODO
 std::string Process::getNetworkInBandwidth()
 {
-    throw Unimplemented();
+    return "-1";
 }
 
 // TODO
 std::string Process::getNetworkOutBandwidth()
 {
-    throw Unimplemented();
+    return "-1";
 }
 
 // TODO
 std::string Process::getIoRead()
 {
-    throw Unimplemented();
+
+    return "-1";
 }
 
 // TODO
 std::string Process::getIoWrite()
 {
-    throw Unimplemented();
+    return "-1";
 }
 
 std::string Process::toJsonStr(const std::vector<Attribute> &attrs)
@@ -237,8 +238,8 @@ std::string Process::toJsonStr(const std::vector<Attribute> &attrs)
             jsonAttrStr.append(this->getIoRead());
         else if (attrs.at(i).name == "ioWrite")
             jsonAttrStr.append(this->getIoWrite());
-        
-        if(i != numOfAttrs -1)
+
+        if (i != numOfAttrs - 1)
             jsonAttrStr.push_back(',');
 
         result.append(jsonAttrStr);

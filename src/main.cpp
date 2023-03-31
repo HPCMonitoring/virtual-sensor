@@ -1,5 +1,5 @@
 #include "filter.h"
-#include "process.h"
+#include "repository.h"
 
 void signalHandler(int signal)
 {
@@ -18,9 +18,9 @@ int main(int argc, char *argv[])
     attrs.push_back(Attribute("executePath", "execPath"));
     attrs.push_back(Attribute("command", "cmd"));
 
-    Process p(1);
-
-    std::cout << p.toJsonStr(attrs) << std::endl;
+    const Filter filter(PROCESS, attrs, "&& 2 == pid 1 || 2 == uid 10 < cpu 20");
+    Repository& r = Repository::getInstance();
+    std::cout << r.getData(filter) << std::endl;
 
     // while (true);
     return 0;

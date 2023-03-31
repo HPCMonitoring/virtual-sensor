@@ -27,6 +27,7 @@ protected:
 public:
     virtual bool check() = 0;
     virtual void print() = 0;
+    virtual std::string findPid() = 0;
     virtual ~Expr(){};
 };
 
@@ -41,6 +42,10 @@ public:
     RelationalExpr(const std::string &op, const std::string &operand, const std::string &literal);
     bool check();
     void print();
+    std::string findPid() {
+        if(this->operand == "pid") return this->literal;
+        return "";
+    }
 };
 
 class LogicalExpr : public Expr
@@ -53,6 +58,15 @@ public:
     LogicalExpr(const std::string &op, const ushort numOfSubExprs);
     bool check();
     void print();
+    std::string findPid() {
+        for(size_t i = 0 ; i < this->subExprs.size(); ++i) {
+            const std::string pid = this->subExprs.at(i)->findPid();
+            if(pid.length() != 0) {
+                return pid;
+            }
+        }
+        return "";
+    }
     ~LogicalExpr();
 };
 
