@@ -6,4 +6,4 @@ clean_git:
 	git branch --merged >/tmp/merged-branches && nano /tmp/merged-branches && xargs git branch -D </tmp/merged-branches && git fetch --prune --all
 
 start_consumer:
-	cd checktools && ./consumer getting-started.ini
+	cd checktools && ./consumer config.ini

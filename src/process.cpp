@@ -1,8 +1,6 @@
 #include "process.h"
 #include "exceptions.h"
 
-#ifdef __PROCESS_H__
-
 inline bool fileExists(const std::string &name)
 {
     struct stat buffer;
@@ -182,19 +180,16 @@ std::string ProcessInfo::getIoWrite()
     throw Unimplemented();
 }
 
-void printProcessInfo(ProcessInfo *p)
-{
-    std::cout << "Name: " << p->getName() << std::endl;
-    std::cout << "Pid: " << p->getPid() << std::endl;
-    std::cout << "Parent Pid: " << p->getParentPid() << std::endl;
-    std::cout << "Uid: " << p->getUid() << std::endl;
-    std::cout << "Gid: " << p->getGid() << std::endl;
-    std::cout << "Virtual memory usage: " << p->getVirtualMemoryUsage() << " KB" << std::endl;
-    std::cout << "Physical memory usage: " << p->getPhysicalMemoryUsage() << " KB" << std::endl;
-    std::cout << "Cpu time: " << p->getCpuTime() << " ms" << std::endl;
-    std::cout << "Cpu usage: " << p->getCpuUsage() << " %" << std::endl;
-    std::cout << "Execute path: " << p->getExecutePath() << std::endl;
-    std::cout << "Command: " << p->getCommand() << std::endl;
+void ProcessInfo::print() {
+    std::cout << "Name: " << this->getName() << std::endl;
+    std::cout << "Pid: " << this->getPid() << std::endl;
+    std::cout << "Parent Pid: " << this->getParentPid() << std::endl;
+    std::cout << "Uid: " << this->getUid() << std::endl;
+    std::cout << "Gid: " << this->getGid() << std::endl;
+    std::cout << "Virtual memory usage: " << this->getVirtualMemoryUsage() << " KB" << std::endl;
+    std::cout << "Physical memory usage: " << this->getPhysicalMemoryUsage() << " KB" << std::endl;
+    std::cout << "Cpu time: " << this->getCpuTime() << " ms" << std::endl;
+    std::cout << "Cpu usage: " << this->getCpuUsage() << " %" << std::endl;
+    std::cout << "Execute path: " << this->getExecutePath() << std::endl;
+    std::cout << "Command: " << this->getCommand() << std::endl;
 }
-
-#endif

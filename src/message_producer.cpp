@@ -1,6 +1,5 @@
 #include "message_producer.h"
 #include "exceptions.h"
-#ifdef __MESSAGE_PRODUCER_H__
 
 MessageProducer::MessageProducer(const std::string &clientId, const std::string &brokerUrl)
 {
@@ -31,14 +30,21 @@ MessageProducer::~MessageProducer()
     delete this->producer;
 }
 
-MessageProducer::Worker *MessageProducer::createWorker(const std::string &topicName, const FilterRule &filterRule, const time_t interval)
+MessageProducer::Worker *MessageProducer::createWorker(const std::string &topicName, Filter* filter, const time_t interval)
 {
-    MessageProducer::Worker *worker = MessageProducer::Worker::buildTopic(this->producer, topicName)
-                                          ->buildFilterRule(filterRule)
-                                          ->buildTimeInterval(interval)
-                                          ->build();
+    MessageProducer::Worker *worker = new MessageProducer::Worker(producer, topicName, filter, interval);
     this->workers.insert({topicName, worker});
     return worker;
+}
+
+MessageProducer::Worker::Worker(RdKafka::Producer *handler, const std::string &topicName, Filter *filter, const time_t interval) {
+    std::string errMsg;
+    RdKafka::Topic *topic = RdKafka::Topic::create(handler, topicName, NULL, errMsg);
+    this->topic = topic;
+    this->topicName = topicName;
+    this->filter = filter;
+    this->interval = interval;
+    this->job = std::thread(&MessageProducer::Worker::_sendMessage, this, "Hello world !");
 }
 
 void MessageProducer::removeWorker(const std::string &topicName)
@@ -48,41 +54,14 @@ void MessageProducer::removeWorker(const std::string &topicName)
     this->workers.erase(topicName);
 }
 
-MessageProducer::Worker *MessageProducer::getWorker(const std::string &topicName)
+MessageProducer::Worker *MessageProducer::getWorker(const std::string &topicName) const
 {
     return this->workers.at(topicName);
 }
 
-MessageProducer::Worker *MessageProducer::Worker::buildTopic(RdKafka::Producer *producer, const std::string &topicName)
+Filter *MessageProducer::Worker::getFilter()
 {
-    std::string errMsg;
-    RdKafka::Topic *rawTopic = RdKafka::Topic::create(producer, topicName, NULL, errMsg);
-    MessageProducer::Worker *topic = new Worker(rawTopic, producer);
-    topic->topicName = topicName;
-    return topic;
-}
-
-MessageProducer::Worker *MessageProducer::Worker::buildFilterRule(const FilterRule &filterRule)
-{
-    this->filterRule = filterRule;
-    return this;
-}
-
-MessageProducer::Worker *MessageProducer::Worker::buildTimeInterval(const time_t interval)
-{
-    this->interval = interval;
-    return this;
-}
-
-MessageProducer::Worker *MessageProducer::Worker::build()
-{
-    this->_sendMessage("Hello world !");
-    return this;
-}
-
-FilterRule *MessageProducer::Worker::getFilterRule()
-{
-    return &this->filterRule;
+    return this->filter;
 }
 
 time_t MessageProducer::Worker::getInterval()
@@ -92,7 +71,8 @@ time_t MessageProducer::Worker::getInterval()
 
 MessageProducer::Worker::~Worker()
 {
+    // Gracefully terminate program
+    this->stopFlag = true;
+    this->job.join();
     delete this->topic;
 }
-
-#endif

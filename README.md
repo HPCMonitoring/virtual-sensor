@@ -75,23 +75,6 @@ make test_memory_leak
 
 ## Testing tools
 
-To host a kafka server in local (default port 9092), run:
-
-```bash
-docker-compose up -d
-```
-
-Create a topic named `purchases`:
-
-```bash
-docker compose exec broker \
-  kafka-topics --create \
-    --topic purchases \
-    --bootstrap-server localhost:9092 \
-    --replication-factor 1 \
-    --partitions 1
-```
-
 To start a kafka consumer (subscribe topic `purchases`) for testing, run:
 
 ```bash
