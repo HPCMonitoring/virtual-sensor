@@ -7,7 +7,7 @@ inline bool fileExists(const std::string &name)
     return (stat(name.c_str(), &buffer) == 0);
 }
 
-ProcessInfo::ProcessInfo(pid_t pid)
+Process::Process(pid_t pid)
 {
     if (pid < 0)
         throw InvalidPID();
@@ -22,40 +22,40 @@ ProcessInfo::ProcessInfo(pid_t pid)
     this->pid = std::to_string(pid);
 }
 
-std::string ProcessInfo::getName()
+std::string Process::getName()
 {
     if (this->name.length() == 0)
         this->name = this->_readProcessInfoFile(ProcessStatusInfoLine::NAME);
     return this->name;
 }
 
-std::string ProcessInfo::getPid()
+std::string Process::getPid()
 {
     return this->pid;
 }
 
-std::string ProcessInfo::getParentPid()
+std::string Process::getParentPid()
 {
     if (this->parentPid.length() == 0)
         this->parentPid = this->_readProcessInfoFile(ProcessStatusInfoLine::PARENT_PID);
     return this->parentPid;
 }
 
-std::string ProcessInfo::getUid()
+std::string Process::getUid()
 {
     if (this->uid.length() == 0)
         this->uid = this->_readProcessInfoFile(ProcessStatusInfoLine::UID);
     return this->uid;
 }
 
-std::string ProcessInfo::getGid()
+std::string Process::getGid()
 {
     if (this->gid.length() == 0)
         this->gid = this->_readProcessInfoFile(ProcessStatusInfoLine::GID);
     return this->gid;
 }
 
-std::string ProcessInfo::getExecutePath()
+std::string Process::getExecutePath()
 {
     if (this->executePath.length() > 0)
         return this->executePath;
@@ -72,7 +72,7 @@ std::string ProcessInfo::getExecutePath()
     return this->executePath;
 }
 
-std::string ProcessInfo::getCommand()
+std::string Process::getCommand()
 {
     if (this->command.length() > 0)
         return this->command;
@@ -85,17 +85,17 @@ std::string ProcessInfo::getCommand()
     return this->command;
 }
 
-std::string ProcessInfo::getVirtualMemoryUsage()
+std::string Process::getVirtualMemoryUsage()
 {
     return this->_readProcessInfoFile(ProcessStatusInfoLine::VM_SIZE);
 }
 
-std::string ProcessInfo::getPhysicalMemoryUsage()
+std::string Process::getPhysicalMemoryUsage()
 {
     return this->_readProcessInfoFile(ProcessStatusInfoLine::RSS);
 }
 
-std::string ProcessInfo::getCpuTime()
+std::string Process::getCpuTime()
 {
     std::ifstream statFile(this->processEntryDirname + "/stat");
     if (!statFile.is_open())
@@ -131,7 +131,7 @@ std::string ProcessInfo::getCpuTime()
     return std::to_string((double)(sysCpuTime + userCpuTime) / CLOCK_PER_MILISECS);
 }
 
-std::string ProcessInfo::getCpuUsage()
+std::string Process::getCpuUsage()
 {
     std::string command = "ps -p " + this->pid + " -o \%cpu";
     FILE *pipe = popen(command.c_str(), "r");
@@ -157,39 +157,93 @@ std::string ProcessInfo::getCpuUsage()
 }
 
 // TODO
-std::string ProcessInfo::getNetworkInBandwidth()
+std::string Process::getNetworkInBandwidth()
 {
     throw Unimplemented();
 }
 
 // TODO
-std::string ProcessInfo::getNetworkOutBandwidth()
+std::string Process::getNetworkOutBandwidth()
 {
     throw Unimplemented();
 }
 
 // TODO
-std::string ProcessInfo::getIoRead()
+std::string Process::getIoRead()
 {
     throw Unimplemented();
 }
 
 // TODO
-std::string ProcessInfo::getIoWrite()
+std::string Process::getIoWrite()
 {
     throw Unimplemented();
 }
 
-void ProcessInfo::print() {
-    std::cout << "Name: " << this->getName() << std::endl;
-    std::cout << "Pid: " << this->getPid() << std::endl;
-    std::cout << "Parent Pid: " << this->getParentPid() << std::endl;
-    std::cout << "Uid: " << this->getUid() << std::endl;
-    std::cout << "Gid: " << this->getGid() << std::endl;
-    std::cout << "Virtual memory usage: " << this->getVirtualMemoryUsage() << " KB" << std::endl;
-    std::cout << "Physical memory usage: " << this->getPhysicalMemoryUsage() << " KB" << std::endl;
-    std::cout << "Cpu time: " << this->getCpuTime() << " ms" << std::endl;
-    std::cout << "Cpu usage: " << this->getCpuUsage() << " %" << std::endl;
-    std::cout << "Execute path: " << this->getExecutePath() << std::endl;
-    std::cout << "Command: " << this->getCommand() << std::endl;
+std::string Process::toJsonStr(const std::vector<Attribute> &attrs)
+{
+    size_t numOfAttrs = attrs.size();
+    std::string result;
+    result.push_back('{');
+
+    for (size_t i = 0; i < numOfAttrs; ++i)
+    {
+        std::string jsonAttrStr = "";
+        std::string fieldName = attrs.at(i).alias.length() > 0 ? attrs.at(i).alias : attrs.at(i).name;
+
+        jsonAttrStr.push_back('\"');
+        jsonAttrStr.append(fieldName);
+        jsonAttrStr.append("\":");
+
+        if (attrs.at(i).name == "name")
+        {
+            jsonAttrStr.push_back('\"');
+            jsonAttrStr.append(this->getName());
+            jsonAttrStr.push_back('\"');
+        }
+        else if (attrs.at(i).name == "pid")
+            jsonAttrStr.append(this->getPid());
+        else if (attrs.at(i).name == "parentPid")
+            jsonAttrStr.append(this->getParentPid());
+        else if (attrs.at(i).name == "uid")
+            jsonAttrStr.append(this->getUid());
+        else if (attrs.at(i).name == "gid")
+            jsonAttrStr.append(this->getGid());
+        else if (attrs.at(i).name == "executePath")
+        {
+            jsonAttrStr.push_back('\"');
+            jsonAttrStr.append(this->getExecutePath());
+            jsonAttrStr.push_back('\"');
+        }
+        else if (attrs.at(i).name == "command")
+        {
+            jsonAttrStr.push_back('\"');
+            jsonAttrStr.append(this->getCommand());
+            jsonAttrStr.push_back('\"');
+        }
+        else if (attrs.at(i).name == "virtualMemoryUsage")
+            jsonAttrStr.append(this->getVirtualMemoryUsage());
+        else if (attrs.at(i).name == "physicalMemoryUsage")
+            jsonAttrStr.append(this->getPhysicalMemoryUsage());
+        else if (attrs.at(i).name == "cpuTime")
+            jsonAttrStr.append(this->getCpuTime());
+        else if (attrs.at(i).name == "cpuUsage")
+            jsonAttrStr.append(this->getCpuUsage());
+        else if (attrs.at(i).name == "networkInBandwidth")
+            jsonAttrStr.append(this->getNetworkInBandwidth());
+        else if (attrs.at(i).name == "networkOutBandwidth")
+            jsonAttrStr.append(this->getNetworkOutBandwidth());
+        else if (attrs.at(i).name == "ioRead")
+            jsonAttrStr.append(this->getIoRead());
+        else if (attrs.at(i).name == "ioWrite")
+            jsonAttrStr.append(this->getIoWrite());
+        
+        if(i != numOfAttrs -1)
+            jsonAttrStr.push_back(',');
+
+        result.append(jsonAttrStr);
+    }
+
+    result.push_back('}');
+    return result;
 }

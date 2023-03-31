@@ -42,19 +42,16 @@ LogicalExpr::~LogicalExpr()
     }
 }
 
-Filter::Filter(const std::string &datatype, const std::string &fields, const std::string &whereCondition)
+Filter::Filter(const std::string &datatype, const std::vector<Attribute>& attrs, const std::string &whereCondition)
 {
     this->datatype = datatype;
-
-    std::istringstream issFields(fields);
-    std::string temp;
-    while (issFields >> temp)
-        this->fields.push_back(temp);
+    this->attrs = attrs;
 
     std::istringstream issLexicals(whereCondition);
     std::stack<Expr *> exprStack;
     std::stack<std::string> lexicalStack;
 
+    std::string temp;
     while (issLexicals >> temp)
         lexicalStack.push(temp);
 
@@ -104,10 +101,10 @@ void Filter::print()
     std::cout << "Data type: " << this->datatype << std::endl;
     std::cout << "Fields: "
               << "<";
-    std::cout << this->fields.at(0);
-    for (size_t i = 1; i < this->fields.size(); ++i)
+    std::cout << this->attrs.at(0).name;
+    for (size_t i = 1; i < this->attrs.size(); ++i)
     {
-        std::cout << ", " << this->fields.at(i);
+        std::cout << ", " << this->attrs.at(i).name;
     }
     std::cout << '>' << std::endl;
 

@@ -12,6 +12,13 @@
 #define GTE_OP ">="
 #define LIKE_OP "%="
 
+#define PROCESS "process"
+#define NETWORK_INTERFACE "network_interface"
+#define MEMORY "memory"
+#define CPU "cpu"
+#define IO "io"
+#define DISK "disk"
+
 class Expr
 {
 protected:
@@ -49,18 +56,30 @@ public:
     ~LogicalExpr();
 };
 
+class Attribute
+{
+public:
+    std::string name;
+    std::string alias;
+    Attribute(const std::string &name, const std::string &alias)
+    {
+        this->name = name;
+        this->alias = alias;
+    }
+};
+
 class Filter
 {
 public:
     std::string datatype;
-    std::vector<std::string> fields;
+    std::vector<Attribute> attrs;
     Expr *whereCondition;
 
 private:
     Filter();
 
 public:
-    Filter(const std::string &datatype, const std::string &fields, const std::string &whereCondition);
+    Filter(const std::string &datatype, const std::vector<Attribute> &attrs, const std::string &whereCondition);
     void print();
     ~Filter();
 };

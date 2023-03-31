@@ -2,6 +2,7 @@
 #define __PROCESS_H__
 
 #include "main.h"
+#include "filter.h"
 
 #define CLOCK_PER_MILISECS 1000.0
 #define BUFFER_SIZE 128
@@ -21,7 +22,7 @@ inline bool fileExists(const std::string &);
 
 // TODO: Reuse file pointer
 // Get raw info from /proc
-class ProcessInfo
+class Process
 {
 private:
     std::string name;
@@ -40,7 +41,7 @@ private:
     std::string processEntryDirname;
 
 public:
-    ProcessInfo(pid_t);
+    Process(pid_t);
     std::string getName();
     std::string getPid();
     std::string getParentPid();
@@ -57,7 +58,7 @@ public:
     std::string getNetworkOutBandwidth();
     std::string getIoWrite();
     std::string getIoRead();
-    void print() ;
+    std::string toJsonStr(const std::vector<Attribute>&);
 
 private:
     std::string _readProcessInfoFile(const ProcessStatusInfoLine lineNumber)
