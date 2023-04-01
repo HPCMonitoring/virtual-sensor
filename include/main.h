@@ -15,5 +15,6 @@
 #include <unordered_map>
 #include <librdkafka/rdkafkacpp.h>
 #include <dirent.h>
+#include <regex>
 
 #endif

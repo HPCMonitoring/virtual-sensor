@@ -26,23 +26,44 @@ std::string Repository::getData(const Filter &filter)
 
     if (filter.datatype == PROCESS)
     {
-        const std::string pidLiteral = filter.whereCondition != nullptr ? filter.whereCondition->findPid() : "";
+        const std::string pidLiteral = filter.selection != nullptr ? filter.selection->findPid() : "";
         if (pidLiteral.length() > 0)
         {
             const pid_t pid = std::stoi(pidLiteral);
             Process proc(pid);
-            result.append(proc.toJsonStr(filter.attrs));
+            result.append(filter.iterate(&proc));
         }
-        else {
+        else
+        {
             std::vector<pid_t> allPids = this->getAllPids();
             const size_t numOfProcesses = allPids.size();
-            for(size_t i = 0; i < numOfProcesses; ++i) {
+            for (size_t i = 0; i < numOfProcesses; ++i)
+            {
                 Process proc(allPids.at(i));
-                result.append(proc.toJsonStr(filter.attrs));
-                if(i != numOfProcesses - 1 )
+                if (!filter.selection->validate(&proc))
+                    continue;
+
+                result.append(filter.iterate(&proc));
+                if (i != numOfProcesses - 1)
                     result.push_back(',');
             }
         }
+    }
+    else if (filter.datatype == NETWORK_INTERFACE)
+    {
+        
+    }
+    else if (filter.datatype == MEMORY)
+    {
+    }
+    else if (filter.datatype == CPU)
+    {
+    }
+    else if (filter.datatype == IO)
+    {
+    }
+    else if (filter.datatype == DISK)
+    {
     }
     result.push_back(']');
     return result;

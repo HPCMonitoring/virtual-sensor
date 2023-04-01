@@ -2,11 +2,26 @@
 #define __PROCESS_H__
 
 #include "main.h"
-#include "filter.h"
 
 #define CLOCK_PER_MILISECS 1000.0
 #define BUFFER_SIZE 128
 
+#define N_PID "pid"
+#define N_PPID "parentPid"
+#define N_UID "uid"
+#define N_GID "gid"
+#define N_EXEC_PATH "pid"
+#define N_CMD "command"
+#define N_VMU "virtualMemoryUsage"
+#define N_PMU "physicalMemoryUsage"
+#define N_CPUT "cpuTime"
+#define N_CPUU "cpuUsage"
+#define N_NETIN "networkInBandwidth"
+#define N_NETOUT "networkOutBandwidth"
+#define N_IOR "ioRead"
+#define N_IOW "ioWrite"
+#define N_NAME "name"
+ 
 enum ProcessStatusInfoLine
 {
     NAME = 0,
@@ -21,7 +36,6 @@ enum ProcessStatusInfoLine
 inline bool fileExists(const std::string &);
 
 // TODO: Reuse file pointer
-// Get raw info from /proc
 class Process
 {
 private:
@@ -58,7 +72,6 @@ public:
     std::string getNetworkOutBandwidth();
     std::string getIoWrite();
     std::string getIoRead();
-    std::string toJsonStr(const std::vector<Attribute>&);
 
 private:
     std::string _readProcessInfoFile(const ProcessStatusInfoLine lineNumber)

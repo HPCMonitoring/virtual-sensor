@@ -12,14 +12,14 @@ int main(int argc, char *argv[])
     // Register signal handler
     signal(SIGINT, signalHandler);
 
-    std::vector<Attribute> attrs;
-    attrs.push_back(Attribute("pid", "processID"));
-    attrs.push_back(Attribute("name", "pname"));
-    attrs.push_back(Attribute("executePath", "execPath"));
-    attrs.push_back(Attribute("command", "cmd"));
+    std::vector<Attribute> projection;
+    projection.push_back(Attribute("pid", "processID"));
+    projection.push_back(Attribute("name", "pname"));
+    projection.push_back(Attribute("executePath", "execPath"));
+    projection.push_back(Attribute("command", "cmd"));
 
-    // const Filter filter(PROCESS, attrs, "&& 2 == pid 1 || 2 == uid 10 < cpu 20");
-    const Filter filter(PROCESS, attrs, "== pid 3727");
+    // const Filter filter(PROCESS, projection, "&& 2 == pid 1 || 2 == uid 10 < cpu 20");
+    const Filter filter(PROCESS, projection, "== pid 3727");
     Repository &r = Repository::getInstance();
     std::ofstream out("data.json");
     out << r.getData(filter);

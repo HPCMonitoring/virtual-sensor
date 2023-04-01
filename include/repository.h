@@ -3,7 +3,6 @@
 
 #include "main.h"
 #include "filter.h"
-#include "process.h"
 
 #define PROC_FS "/proc"
 
@@ -22,7 +21,7 @@ public:
     static Repository &getInstance();
     std::string getData(const Filter &);
 
-public:
+private:
     std::vector<pid_t> getAllPids()
     {
         std::vector<pid_t> pids;
