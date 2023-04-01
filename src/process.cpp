@@ -15,11 +15,19 @@ Process::Process(pid_t pid)
     std::string processEntryDirname = "/proc/" + std::to_string(pid);
     this->statusFilename = processEntryDirname + "/status";
     if (!fileExists(this->statusFilename))
-        throw ProcessNotExists();
+    {
+        this->_exists = false;
+        return;
+    }
 
     this->processEntryDirname = processEntryDirname;
-
     this->pid = std::to_string(pid);
+    this->_exists = true;
+}
+
+bool Process::exists() const
+{
+    return this->_exists;
 }
 
 std::string Process::getName()

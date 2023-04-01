@@ -18,12 +18,9 @@ int main(int argc, char *argv[])
     projection.push_back(Attribute("executePath", "execPath"));
     projection.push_back(Attribute("command", "cmd"));
 
-    // const Filter filter(PROCESS, projection, "&& 2 == pid 1 || 2 == uid 10 < cpu 20");
-    const Filter filter(PROCESS, projection, "== pid 3727");
+    const Filter filter(PROCESS, projection, "%= name syste[a-z]+");
     Repository &r = Repository::getInstance();
-    std::ofstream out("data.json");
-    out << r.getData(filter);
-    out.close();
+    std::cout << r.getData(filter) << std::endl;
     // while (true);
     return 0;
 }

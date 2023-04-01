@@ -10,7 +10,7 @@
 #define N_PPID "parentPid"
 #define N_UID "uid"
 #define N_GID "gid"
-#define N_EXEC_PATH "pid"
+#define N_EXEC_PATH "executePath"
 #define N_CMD "command"
 #define N_VMU "virtualMemoryUsage"
 #define N_PMU "physicalMemoryUsage"
@@ -50,12 +50,14 @@ private:
     std::string networkOutBandwidth;
     std::string ioWrite; // In KB
     std::string ioRead;  // In KB
+    bool _exists;
 private:
     std::string statusFilename;
     std::string processEntryDirname;
 
 public:
     Process(pid_t);
+    bool exists() const;
     std::string getName();
     std::string getPid();
     std::string getParentPid();

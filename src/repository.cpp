@@ -31,7 +31,8 @@ std::string Repository::getData(const Filter &filter)
         {
             const pid_t pid = std::stoi(pidLiteral);
             Process proc(pid);
-            result.append(filter.iterate(&proc));
+            if (proc.exists())
+                result.append(filter.iterate(&proc));
         }
         else
         {
@@ -40,18 +41,16 @@ std::string Repository::getData(const Filter &filter)
             for (size_t i = 0; i < numOfProcesses; ++i)
             {
                 Process proc(allPids.at(i));
-                if (!filter.selection->validate(&proc))
+                if (!proc.exists() || !filter.selection->validate(&proc))
                     continue;
 
                 result.append(filter.iterate(&proc));
-                if (i != numOfProcesses - 1)
-                    result.push_back(',');
+                result.push_back(',');
             }
         }
     }
     else if (filter.datatype == NETWORK_INTERFACE)
     {
-        
     }
     else if (filter.datatype == MEMORY)
     {
@@ -65,6 +64,7 @@ std::string Repository::getData(const Filter &filter)
     else if (filter.datatype == DISK)
     {
     }
+    result.pop_back();
     result.push_back(']');
     return result;
 }
