@@ -6,3 +6,4 @@ logs
 wsconfig.json
 cmake-build-debug
 .idea
+*.json

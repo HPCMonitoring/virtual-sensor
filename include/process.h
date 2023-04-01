@@ -6,6 +6,22 @@
 #define CLOCK_PER_MILISECS 1000.0
 #define BUFFER_SIZE 128
 
+#define N_PID "pid"
+#define N_PPID "parentPid"
+#define N_UID "uid"
+#define N_GID "gid"
+#define N_EXEC_PATH "executePath"
+#define N_CMD "command"
+#define N_VMU "virtualMemoryUsage"
+#define N_PMU "physicalMemoryUsage"
+#define N_CPUT "cpuTime"
+#define N_CPUU "cpuUsage"
+#define N_NETIN "networkInBandwidth"
+#define N_NETOUT "networkOutBandwidth"
+#define N_IOR "ioRead"
+#define N_IOW "ioWrite"
+#define N_NAME "name"
+ 
 enum ProcessStatusInfoLine
 {
     NAME = 0,
@@ -20,8 +36,7 @@ enum ProcessStatusInfoLine
 inline bool fileExists(const std::string &);
 
 // TODO: Reuse file pointer
-// Get raw info from /proc
-class ProcessInfo
+class Process
 {
 private:
     std::string name;
@@ -35,14 +50,15 @@ private:
     std::string networkOutBandwidth;
     std::string ioWrite; // In KB
     std::string ioRead;  // In KB
+    bool _exists;
 private:
     std::string statusFilename;
     std::string processEntryDirname;
 
 public:
-    ProcessInfo(pid_t);
+    Process(pid_t);
+    bool exists() const;
     std::string getName();
-
     std::string getPid();
     std::string getParentPid();
     std::string getUid();
@@ -103,7 +119,5 @@ private:
         return line;
     }
 };
-
-void printProcessInfo(ProcessInfo *);
 
 #endif

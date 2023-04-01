@@ -9,7 +9,12 @@
 #include <unistd.h>
 #include <climits>
 #include <thread>
+#include <atomic>
+#include <stack>
+#include <csignal>
 #include <unordered_map>
 #include <librdkafka/rdkafkacpp.h>
+#include <dirent.h>
+#include <regex>
 
 #endif

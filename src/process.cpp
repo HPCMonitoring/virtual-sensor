@@ -1,15 +1,13 @@
 #include "process.h"
 #include "exceptions.h"
 
-#ifdef __PROCESS_H__
-
 inline bool fileExists(const std::string &name)
 {
     struct stat buffer;
     return (stat(name.c_str(), &buffer) == 0);
 }
 
-ProcessInfo::ProcessInfo(pid_t pid)
+Process::Process(pid_t pid)
 {
     if (pid < 0)
         throw InvalidPID();
@@ -17,47 +15,55 @@ ProcessInfo::ProcessInfo(pid_t pid)
     std::string processEntryDirname = "/proc/" + std::to_string(pid);
     this->statusFilename = processEntryDirname + "/status";
     if (!fileExists(this->statusFilename))
-        throw ProcessNotExists();
+    {
+        this->_exists = false;
+        return;
+    }
 
     this->processEntryDirname = processEntryDirname;
-
     this->pid = std::to_string(pid);
+    this->_exists = true;
 }
 
-std::string ProcessInfo::getName()
+bool Process::exists() const
+{
+    return this->_exists;
+}
+
+std::string Process::getName()
 {
     if (this->name.length() == 0)
         this->name = this->_readProcessInfoFile(ProcessStatusInfoLine::NAME);
     return this->name;
 }
 
-std::string ProcessInfo::getPid()
+std::string Process::getPid()
 {
     return this->pid;
 }
 
-std::string ProcessInfo::getParentPid()
+std::string Process::getParentPid()
 {
     if (this->parentPid.length() == 0)
         this->parentPid = this->_readProcessInfoFile(ProcessStatusInfoLine::PARENT_PID);
     return this->parentPid;
 }
 
-std::string ProcessInfo::getUid()
+std::string Process::getUid()
 {
     if (this->uid.length() == 0)
         this->uid = this->_readProcessInfoFile(ProcessStatusInfoLine::UID);
     return this->uid;
 }
 
-std::string ProcessInfo::getGid()
+std::string Process::getGid()
 {
     if (this->gid.length() == 0)
         this->gid = this->_readProcessInfoFile(ProcessStatusInfoLine::GID);
     return this->gid;
 }
 
-std::string ProcessInfo::getExecutePath()
+std::string Process::getExecutePath()
 {
     if (this->executePath.length() > 0)
         return this->executePath;
@@ -74,7 +80,7 @@ std::string ProcessInfo::getExecutePath()
     return this->executePath;
 }
 
-std::string ProcessInfo::getCommand()
+std::string Process::getCommand()
 {
     if (this->command.length() > 0)
         return this->command;
@@ -87,17 +93,17 @@ std::string ProcessInfo::getCommand()
     return this->command;
 }
 
-std::string ProcessInfo::getVirtualMemoryUsage()
+std::string Process::getVirtualMemoryUsage()
 {
     return this->_readProcessInfoFile(ProcessStatusInfoLine::VM_SIZE);
 }
 
-std::string ProcessInfo::getPhysicalMemoryUsage()
+std::string Process::getPhysicalMemoryUsage()
 {
     return this->_readProcessInfoFile(ProcessStatusInfoLine::RSS);
 }
 
-std::string ProcessInfo::getCpuTime()
+std::string Process::getCpuTime()
 {
     std::ifstream statFile(this->processEntryDirname + "/stat");
     if (!statFile.is_open())
@@ -133,7 +139,7 @@ std::string ProcessInfo::getCpuTime()
     return std::to_string((double)(sysCpuTime + userCpuTime) / CLOCK_PER_MILISECS);
 }
 
-std::string ProcessInfo::getCpuUsage()
+std::string Process::getCpuUsage()
 {
     std::string command = "ps -p " + this->pid + " -o \%cpu";
     FILE *pipe = popen(command.c_str(), "r");
@@ -159,42 +165,26 @@ std::string ProcessInfo::getCpuUsage()
 }
 
 // TODO
-std::string ProcessInfo::getNetworkInBandwidth()
+std::string Process::getNetworkInBandwidth()
 {
-    throw Unimplemented();
+    return "-1";
 }
 
 // TODO
-std::string ProcessInfo::getNetworkOutBandwidth()
+std::string Process::getNetworkOutBandwidth()
 {
-    throw Unimplemented();
+    return "-1";
 }
 
 // TODO
-std::string ProcessInfo::getIoRead()
+std::string Process::getIoRead()
 {
-    throw Unimplemented();
+
+    return "-1";
 }
 
 // TODO
-std::string ProcessInfo::getIoWrite()
+std::string Process::getIoWrite()
 {
-    throw Unimplemented();
+    return "-1";
 }
-
-void printProcessInfo(ProcessInfo *p)
-{
-    std::cout << "Name: " << p->getName() << std::endl;
-    std::cout << "Pid: " << p->getPid() << std::endl;
-    std::cout << "Parent Pid: " << p->getParentPid() << std::endl;
-    std::cout << "Uid: " << p->getUid() << std::endl;
-    std::cout << "Gid: " << p->getGid() << std::endl;
-    std::cout << "Virtual memory usage: " << p->getVirtualMemoryUsage() << " KB" << std::endl;
-    std::cout << "Physical memory usage: " << p->getPhysicalMemoryUsage() << " KB" << std::endl;
-    std::cout << "Cpu time: " << p->getCpuTime() << " ms" << std::endl;
-    std::cout << "Cpu usage: " << p->getCpuUsage() << " %" << std::endl;
-    std::cout << "Execute path: " << p->getExecutePath() << std::endl;
-    std::cout << "Command: " << p->getCommand() << std::endl;
-}
-
-#endif
