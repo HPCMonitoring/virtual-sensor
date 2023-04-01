@@ -31,7 +31,7 @@ std::string Repository::getData(const Filter &filter)
         {
             const pid_t pid = std::stoi(pidLiteral);
             Process proc(pid);
-            if (proc.exists())
+            if (proc.exists() && filter.selection->validate(&proc))
                 result.append(filter.iterate(&proc));
         }
         else

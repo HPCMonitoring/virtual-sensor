@@ -33,10 +33,17 @@ int main(int argc, char *argv[])
     projection.push_back(Attribute("name", "pname"));
     projection.push_back(Attribute("executePath", "execPath"));
     projection.push_back(Attribute("command", "cmd"));
+    projection.push_back(Attribute("cpuUsage", ""));
+    projection.push_back(Attribute("cpuTime", ""));
+    projection.push_back(Attribute(N_VMU, "VmUsage"));
+    projection.push_back(Attribute(N_PMU, "PmUsage"));
 
-    const Filter filter(PROCESS, projection, "%= name syste[a-z]+");
+    const Filter filter(PROCESS, projection, "&& 2 < virtualMemoryUsage 20000 >= virtualMemoryUsage 17500");
+    // const Filter filter(PROCESS, projection, "AND 1 == pid 1");
     Repository &r = Repository::getInstance();
     std::cout << r.getData(filter) << std::endl;
+    
+    // std::cout << std::stod("-1") << std::endl;
     // while (true);
     return 0;
 }

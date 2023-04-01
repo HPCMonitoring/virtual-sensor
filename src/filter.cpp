@@ -80,7 +80,7 @@ bool RelationalExpr::validate(Process *proc) const
 
     return false;
 }
-void RelationalExpr::print()
+void RelationalExpr::print() const
 {
     std::cout << '(' << this->op << ' ' << this->operand << ' ' << this->literal << ')';
 }
@@ -118,7 +118,7 @@ bool LogicalExpr::validate(Process *proc) const
     }
     return false;
 }
-void LogicalExpr::print()
+void LogicalExpr::print() const
 {
     std::cout << '(' << this->op << ' ' << this->numSubOfExprs << ' ';
     for (size_t i = 0; i < this->subExprs.size(); ++i)

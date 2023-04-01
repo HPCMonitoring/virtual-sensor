@@ -4,7 +4,7 @@
 #include "main.h"
 
 #define CLOCK_PER_MILISECS 1000.0
-#define BUFFER_SIZE 128
+#define BUFFER_SIZE 5000
 
 #define N_PID "pid"
 #define N_PPID "parentPid"
@@ -46,6 +46,10 @@ private:
     std::string gid;
     std::string executePath;
     std::string command;
+    std::string virtualMemoryUsage;
+    std::string physicalMemoryUsage;
+    std::string cpuTime;
+    std::string cpuUsage;
     std::string networkInBandwidth; // What interface ???
     std::string networkOutBandwidth;
     std::string ioWrite; // In KB
