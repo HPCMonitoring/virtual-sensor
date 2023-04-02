@@ -64,7 +64,8 @@ std::string Repository::getData(const Filter &filter)
     else if (filter.datatype == DISK)
     {
     }
-    result.pop_back();
+    if (result.length() > 1)
+        result.pop_back();
     result.push_back(']');
     return result;
 }
