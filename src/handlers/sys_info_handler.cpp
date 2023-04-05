@@ -8,7 +8,7 @@ void SysInfoHandler::handle(ClientConnector *responder, const WsMessage& message
     sysInfo->hostname = "PhucVinh";
     sysInfo->rootUser = "root";
 
-    WsMessage res = message;
+    WsMessage res = WsMessage::from(message);
     res.msg = "success";
     res.error = 0;
     res.payload = sysInfo;

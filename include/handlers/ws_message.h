@@ -23,8 +23,15 @@ public:
     std::string msg;
     std::string coordId;
     JsonSerializable *payload = nullptr;
+
+public:
+    static WsMessage from(const WsMessage &);
     std::string toJson() const override;
     ~WsMessage() override;
+    WsMessage();
+    WsMessage(WsMessage &&);
+    WsMessage(WsMessage &) = delete;
+    void operator=(const WsMessage &) = delete;
 };
 
 

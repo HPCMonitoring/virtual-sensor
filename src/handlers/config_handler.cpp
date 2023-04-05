@@ -32,7 +32,7 @@ void ConfigHandler::handle(ClientConnector *responder, const WsMessage &msg) {
             WorkerRepository::getInstance()->addWorker(brokerUrl, workerProp);
 
             // Send response message
-            WsMessage response = msg;
+            WsMessage response = WsMessage::from(msg);
             response.error = WsErrorCode::SUCCESS;
             response.msg = "success";
 
