@@ -8,6 +8,12 @@
 enum WsCommand {
     AUTH = 1000,
     SYS_INFO = 2000,
+    CONFIG = 2001
+};
+
+enum WsErrorCode {
+    SUCCESS = 0,
+    UNKNOWN = 999;
 };
 
 class WsMessage : public JsonSerializable {
