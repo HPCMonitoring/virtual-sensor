@@ -1,4 +1,5 @@
 #include "filter.h"
+#include <iomanip>
 
 template <typename T>
 inline bool compare(const T &a, const T &b, const std::string &op)
@@ -152,7 +153,7 @@ Filter::Filter(const std::string &datatype, const std::vector<Attribute> &projec
     std::stack<std::string> lexicalStack;
 
     std::string temp;
-    while (issLexicals >> temp)
+    while (issLexicals >> std::quoted(temp))
         lexicalStack.push(temp);
 
     std::stack<std::string> operandStack;
