@@ -13,7 +13,7 @@ enum WsCommand {
 
 enum WsErrorCode {
     SUCCESS = 0,
-    UNKNOWN = 999;
+    UNKNOWN = 999,
 };
 
 class WsMessage : public JsonSerializable {
