@@ -30,20 +30,18 @@ MessageProducer::~MessageProducer()
     delete this->producer;
 }
 
-MessageProducer::Worker *MessageProducer::createWorker(const std::string &topicName, Filter* filter, const time_t interval)
+MessageProducer::Worker *MessageProducer::createWorker(MessageProducer::WorkerProp *prop)
 {
-    MessageProducer::Worker *worker = new MessageProducer::Worker(producer, topicName, filter, interval);
-    this->workers.insert({topicName, worker});
+    MessageProducer::Worker *worker = new MessageProducer::Worker(producer, prop);
+    this->workers.insert({prop->topicName, worker});
     return worker;
 }
 
-MessageProducer::Worker::Worker(RdKafka::Producer *handler, const std::string &topicName, Filter *filter, const time_t interval) {
+MessageProducer::Worker::Worker(RdKafka::Producer *handler, WorkerProp *prop) {
     std::string errMsg;
-    RdKafka::Topic *topic = RdKafka::Topic::create(handler, topicName, NULL, errMsg);
+    this->prop = prop;
+    RdKafka::Topic *topic = RdKafka::Topic::create(handler, this->prop->topicName, NULL, errMsg);
     this->topic = topic;
-    this->topicName = topicName;
-    this->filter = filter;
-    this->interval = interval;
     this->handler = handler;
     this->job = std::thread(&MessageProducer::Worker::_sendMessage, this, "Hello world !");
 }
@@ -60,14 +58,8 @@ MessageProducer::Worker *MessageProducer::getWorker(const std::string &topicName
     return this->workers.at(topicName);
 }
 
-Filter *MessageProducer::Worker::getFilter()
-{
-    return this->filter;
-}
-
-time_t MessageProducer::Worker::getInterval()
-{
-    return this->interval;
+MessageProducer::WorkerProp *MessageProducer::Worker::getProp() {
+    return this->prop;
 }
 
 void MessageProducer::Worker::_sendMessage(const std::string &msg) {
@@ -83,7 +75,7 @@ void MessageProducer::Worker::_sendMessage(const std::string &msg) {
                                NULL,  // Key
                                0,     // Key length
                                NULL); // Opaque value
-        sleep(this->interval);
+        sleep(this->prop->interval);
     }
 
 }
@@ -93,4 +85,14 @@ MessageProducer::Worker::~Worker()
     this->stopFlag = true;
     this->job.join();
     delete this->topic;
+    delete this->prop;
+}
+
+MessageProducer::WorkerProp::WorkerProp(const std::string &topicName, Filter *filter, const time_t interval) :
+        topicName(topicName), filter(filter), interval(interval) {
+    // do nothing
+}
+
+MessageProducer::WorkerProp::~WorkerProp() {
+    delete this->filter;
 }

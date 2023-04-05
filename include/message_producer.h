@@ -8,6 +8,7 @@ class MessageProducer
 {
 public:
     class Worker;
+    class WorkerProp;
 
 private:
     RdKafka::Producer *producer;
@@ -17,7 +18,7 @@ private:
 
 public:
     MessageProducer(const std::string &clientId, const std::string &brokerUrl);
-    Worker *createWorker(const std::string &topicName, Filter *filter, const time_t interval);
+    Worker *createWorker(WorkerProp *);
     void removeWorker(const std::string &topicName);
     Worker *getWorker(const std::string &topicName) const;
     ~MessageProducer();
@@ -28,21 +29,29 @@ public:
     private:
         RdKafka::Producer *handler;
         RdKafka::Topic *topic;
-        std::string topicName;
-        Filter *filter;
-        time_t interval;
+        WorkerProp* prop;
         std::thread job;
         std::atomic<bool> stopFlag;
 
     public:
-        Worker(RdKafka::Producer *, const std::string &, Filter *, const time_t );
-        Filter *getFilter();
-        time_t getInterval();
+        Worker(RdKafka::Producer *, WorkerProp *);
+        WorkerProp* getProp();
         ~Worker();
 
     private:
         void _sendMessage(const std::string &msg);
     };
+
+    class WorkerProp {
+    public:
+        const std::string topicName;
+        const Filter *filter;
+        const time_t interval;
+        WorkerProp(const std::string &topicName, Filter* filter, const time_t interval);
+        ~WorkerProp();
+    };
+
+
 };
 
 #endif
