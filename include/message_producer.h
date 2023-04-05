@@ -41,22 +41,7 @@ public:
         ~Worker();
 
     private:
-        void _sendMessage(const std::string &msg)
-        {
-            while (stopFlag == false)
-            {
-                /* code */
-                this->handler->produce(this->topic,
-                                       RdKafka::Topic::PARTITION_UA,
-                                       RdKafka::Producer::RK_MSG_COPY,
-                                       const_cast<char *>(msg.c_str()),
-                                       msg.size(),
-                                       NULL,  // Key
-                                       0,     // Key length
-                                       NULL); // Opaque value
-                sleep(this->interval);
-            }
-        }
+        void _sendMessage(const std::string &msg);
     };
 };
 

@@ -44,6 +44,7 @@ MessageProducer::Worker::Worker(RdKafka::Producer *handler, const std::string &t
     this->topicName = topicName;
     this->filter = filter;
     this->interval = interval;
+    this->handler = handler;
     this->job = std::thread(&MessageProducer::Worker::_sendMessage, this, "Hello world !");
 }
 
@@ -69,6 +70,23 @@ time_t MessageProducer::Worker::getInterval()
     return this->interval;
 }
 
+void MessageProducer::Worker::_sendMessage(const std::string &msg) {
+
+    while (stopFlag == false)
+    {
+        /* code */
+        this->handler->produce(this->topic,
+                               RdKafka::Topic::PARTITION_UA,
+                               RdKafka::Producer::RK_MSG_COPY,
+                               const_cast<char *>(msg.c_str()),
+                               msg.size(),
+                               NULL,  // Key
+                               0,     // Key length
+                               NULL); // Opaque value
+        sleep(this->interval);
+    }
+
+}
 MessageProducer::Worker::~Worker()
 {
     // Gracefully terminate program
