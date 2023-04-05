@@ -21,6 +21,6 @@ std::string WsMessage::toJson() const {
             this->msg %
             this->error %
             this->coordId %
-            this->payload->toJson()
+            (this->payload ? this->payload->toJson() : "{}")
     );
 }
