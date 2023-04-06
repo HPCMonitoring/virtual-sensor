@@ -5,16 +5,13 @@ Recorder::Recorder(const std::string &clientId, const std::string &brokerUrl)
 {
     std::string errstr;
     RdKafka::Conf *conf = RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL);
-
     conf->set("client.id", clientId, errstr);
     conf->set("bootstrap.servers", brokerUrl, errstr);
 
     RdKafka::Producer *kafkaProducer = RdKafka::Producer::create(conf, errstr);
 
     if (!kafkaProducer)
-    {
         throw std::runtime_error(ERR_CREATE_PRODUCER + errstr);
-    }
 
     this->producer = kafkaProducer;
     delete conf;
@@ -22,7 +19,8 @@ Recorder::Recorder(const std::string &clientId, const std::string &brokerUrl)
 
 Recorder::~Recorder()
 {
-    for (std::unordered_map<std::string, Recorder::Worker *>::iterator i = this->workers.begin(); i != this->workers.end(); i++)
+    std::unordered_map<std::string, Recorder::Worker *>::iterator i;
+    for (i = this->workers.begin(); i != this->workers.end(); i++)
     {
         delete i->second;
     }
@@ -30,7 +28,10 @@ Recorder::~Recorder()
     delete this->producer;
 }
 
-Recorder::Worker *Recorder::addWorker(const std::string &topicName, Filter *filter, const time_t interval)
+Recorder::Worker *Recorder::addWorker(
+    const std::string &topicName,
+    Filter *filter,
+    const time_t interval)
 {
     Recorder::Worker *worker = new Recorder::Worker(
         this->producer,
@@ -41,7 +42,11 @@ Recorder::Worker *Recorder::addWorker(const std::string &topicName, Filter *filt
     return worker;
 }
 
-Recorder::Worker::Worker(RdKafka::Producer *handler, const std::string &topicName, Filter *filter, const time_t interval)
+Recorder::Worker::Worker(
+    RdKafka::Producer *handler,
+    const std::string &topicName,
+    Filter *filter,
+    const time_t interval)
 {
     std::string errMsg;
     RdKafka::Topic *topic = RdKafka::Topic::create(handler, topicName, NULL, errMsg);
@@ -61,9 +66,8 @@ Recorder::Worker *Recorder::getWorker(const std::string &topicName) const
 
 Recorder::Worker::~Worker()
 {
-    // Gracefully terminate program
-    this->stopFlag = true;
+    // Gracefully terminate thread
+    this->stopFlag.store(true, std::memory_order_release);
     this->job.join();
     delete this->topic;
-    std::cout << "Worker publishs to " << this->topicName << "was destroyed !" << std::endl;
 }

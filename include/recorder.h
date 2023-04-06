@@ -41,10 +41,8 @@ public:
     private:
         void _sendMessage()
         {
-            while (stopFlag == false)
+            while (!this->stopFlag.load(std::memory_order_acquire))
             {
-                /* code */
-                std::cout << "Message sent !" << std::endl;
                 Repository &r = Repository::getInstance();
                 const std::string monitorData = r.getData(this->filter);
 
@@ -53,9 +51,9 @@ public:
                                        RdKafka::Producer::RK_MSG_COPY,
                                        const_cast<char *>(monitorData.c_str()),
                                        monitorData.size(),
-                                       NULL,  // Key
-                                       0,     // Key length
-                                       NULL); // Opaque value
+                                       this->filter->datatype.c_str(), // Key
+                                       this->filter->datatype.size(),  // Key length
+                                       NULL);                          // Opaque value
                 sleep(this->interval);
             }
         }
