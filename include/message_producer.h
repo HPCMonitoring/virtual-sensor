@@ -36,6 +36,7 @@ public:
     public:
         Worker(RdKafka::Producer *, WorkerProp *);
         WorkerProp* getProp();
+        void stop();
         ~Worker();
 
     private:

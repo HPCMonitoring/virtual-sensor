@@ -28,7 +28,7 @@ MessageProducer::~MessageProducer()
 {
     for (std::unordered_map<std::string, MessageProducer::Worker *>::iterator i = this->workers.begin(); i != this->workers.end(); i++)
     {
-        delete i->second;
+        i->second->stop();
     }
     this->producer->flush(5000);
     delete this->producer;
@@ -49,6 +49,7 @@ MessageProducer::Worker::Worker(RdKafka::Producer *handler, WorkerProp *prop) {
     this->handler = handler;
     this->stopFlag = false;
     this->job = std::thread(&MessageProducer::Worker::_sendMessage, this);
+    this->job.detach();
 }
 
 void MessageProducer::removeWorker(const std::string &topicName)
@@ -92,12 +93,18 @@ void MessageProducer::Worker::_sendMessage() {
         sleep(this->prop->interval);
     }
 
+    // TODO: must review this delete statement to make code clean and understandable
+    delete this;
 }
+
+void MessageProducer::Worker::stop() {
+    this->stopFlag = true;
+}
+
 MessageProducer::Worker::~Worker()
 {
     // Gracefully terminate program
     this->stopFlag = true;
-    this->job.join();
     delete this->topic;
     delete this->prop;
 }
