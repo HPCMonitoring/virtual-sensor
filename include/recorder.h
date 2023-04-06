@@ -4,7 +4,7 @@
 #include "main.h"
 #include "filter.h"
 
-class MessageProducer
+class Recorder
 {
 public:
     class Worker;
@@ -13,14 +13,13 @@ private:
     RdKafka::Producer *producer;
     // Hashmap topic name -> worker
     std::unordered_map<std::string, Worker *> workers;
-    MessageProducer(const MessageProducer &) = delete;
+    Recorder(const Recorder &) = delete;
 
 public:
-    MessageProducer(const std::string &clientId, const std::string &brokerUrl);
-    Worker *createWorker(const std::string &topicName, Filter *filter, const time_t interval);
-    void removeWorker(const std::string &topicName);
+    Recorder(const std::string &clientId, const std::string &brokerUrl);
+    Worker *addWorker(const std::string &topicName, Filter *filter, const time_t interval);
     Worker *getWorker(const std::string &topicName) const;
-    ~MessageProducer();
+    ~Recorder();
 
 public:
     class Worker
@@ -35,9 +34,7 @@ public:
         std::atomic<bool> stopFlag;
 
     public:
-        Worker(RdKafka::Producer *, const std::string &, Filter *, const time_t );
-        Filter *getFilter();
-        time_t getInterval();
+        Worker(RdKafka::Producer *, const std::string &, Filter *, const time_t);
         ~Worker();
 
     private:
@@ -46,6 +43,7 @@ public:
             while (stopFlag == false)
             {
                 /* code */
+                std::cout << "Message sent !" << std::endl;
                 this->handler->produce(this->topic,
                                        RdKafka::Topic::PARTITION_UA,
                                        RdKafka::Producer::RK_MSG_COPY,

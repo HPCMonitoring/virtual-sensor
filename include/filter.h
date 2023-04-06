@@ -30,6 +30,10 @@ public:
         this->name = name;
         this->alias = alias;
     }
+    Attribute(const std::string & name) {
+        this->name = name;
+        this->alias = "";
+    }
 };
 
 class Expr
