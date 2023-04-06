@@ -20,19 +20,19 @@ Repository &Repository::getInstance()
     return instance;
 }
 
-std::string Repository::getData(const Filter &filter)
+std::string Repository::getData(const Filter *filter)
 {
     std::string result = "[";
 
-    if (filter.datatype == PROCESS)
+    if (filter->datatype == PROCESS)
     {
-        const std::string pidLiteral = filter.selection != nullptr ? filter.selection->findPid() : "";
+        const std::string pidLiteral = filter->selection != nullptr ? filter->selection->findPid() : "";
         if (pidLiteral.length() > 0)
         {
             const pid_t pid = std::stoi(pidLiteral);
             Process proc(pid);
-            if (proc.exists() && filter.selection->validate(&proc))
-                result.append(filter.iterate(&proc));
+            if (proc.exists() && filter->selection->validate(&proc))
+                result.append(filter->iterate(&proc));
         }
         else
         {
@@ -41,30 +41,30 @@ std::string Repository::getData(const Filter &filter)
             for (size_t i = 0; i < numOfProcesses; ++i)
             {
                 Process proc(allPids.at(i));
-                if (!proc.exists() || !filter.selection->validate(&proc))
+                if (!proc.exists() || !filter->selection->validate(&proc))
                     continue;
 
-                result.append(filter.iterate(&proc));
+                result.append(filter->iterate(&proc));
                 result.push_back(',');
             }
         }
     }
-    else if (filter.datatype == NETWORK_INTERFACE)
+    else if (filter->datatype == NETWORK_INTERFACE)
     {
     }
-    else if (filter.datatype == MEMORY)
+    else if (filter->datatype == MEMORY)
     {
     }
-    else if (filter.datatype == CPU)
+    else if (filter->datatype == CPU)
     {
     }
-    else if (filter.datatype == IO)
+    else if (filter->datatype == IO)
     {
     }
-    else if (filter.datatype == DISK)
+    else if (filter->datatype == DISK)
     {
     }
-    if (result.length() > 1)
+    if (result.back() == ',')
         result.pop_back();
     result.push_back(']');
     return result;

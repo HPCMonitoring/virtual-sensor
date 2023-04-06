@@ -3,6 +3,7 @@
 
 #include "main.h"
 #include "filter.h"
+#include "repository.h"
 
 class Recorder
 {
@@ -38,17 +39,20 @@ public:
         ~Worker();
 
     private:
-        void _sendMessage(const std::string &msg)
+        void _sendMessage()
         {
             while (stopFlag == false)
             {
                 /* code */
                 std::cout << "Message sent !" << std::endl;
+                Repository &r = Repository::getInstance();
+                const std::string monitorData = r.getData(this->filter);
+
                 this->handler->produce(this->topic,
                                        RdKafka::Topic::PARTITION_UA,
                                        RdKafka::Producer::RK_MSG_COPY,
-                                       const_cast<char *>(msg.c_str()),
-                                       msg.size(),
+                                       const_cast<char *>(monitorData.c_str()),
+                                       monitorData.size(),
                                        NULL,  // Key
                                        0,     // Key length
                                        NULL); // Opaque value

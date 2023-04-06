@@ -51,7 +51,7 @@ Recorder::Worker::Worker(RdKafka::Producer *handler, const std::string &topicNam
     this->filter = filter;
     this->interval = interval;
     this->stopFlag = false;
-    this->job = std::thread(&Recorder::Worker::_sendMessage, this, "Hello world !");
+    this->job = std::thread(&Recorder::Worker::_sendMessage, this);
 }
 
 Recorder::Worker *Recorder::getWorker(const std::string &topicName) const
