@@ -11,6 +11,7 @@ void WorkerRepository::clearAll() {
     for (auto & it : this->producers) {
         delete it.second;
     }
+    this->producers.clear();
 }
 
 void WorkerRepository::addWorker(std::string brokerUrl, MessageProducer::WorkerProp *prop) {
