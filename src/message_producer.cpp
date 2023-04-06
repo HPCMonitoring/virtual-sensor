@@ -47,6 +47,7 @@ MessageProducer::Worker::Worker(RdKafka::Producer *handler, WorkerProp *prop) {
     RdKafka::Topic *topic = RdKafka::Topic::create(handler, this->prop->topicName, NULL, errMsg);
     this->topic = topic;
     this->handler = handler;
+    this->stopFlag = false;
     this->job = std::thread(&MessageProducer::Worker::_sendMessage, this);
 }
 
