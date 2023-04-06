@@ -1,15 +1,18 @@
-#include "filter.h"
 #include "recorder.h"
 
-void signalHandler(int signal)
+std::atomic<bool> terminateFlag;
+
+void handler(int signal)
 {
     std::cout << "Terminating with exit code " << signal << " ...\n";
-    exit(signal);
+    terminateFlag = true;
 }
 
 int main(int argc, char *argv[])
 {
-    signal(SIGINT, signalHandler);
+    signal(SIGINT, handler);
+
+    terminateFlag = false;
     Recorder recorder("1915940", "localhost:9092");
 
     std::vector<Attribute> projection;
@@ -25,6 +28,6 @@ int main(int argc, char *argv[])
 
     recorder.addWorker("hello-world", &filter, 5);
 
-    while (true);
+    while (!terminateFlag);
     return 0;
 }

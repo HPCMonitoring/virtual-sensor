@@ -41,23 +41,24 @@ public:
     private:
         void _sendMessage()
         {
-            while (stopFlag == false)
-            {
+            // while (stopFlag == false)
+            // {
                 /* code */
                 std::cout << "Message sent !" << std::endl;
-                Repository &r = Repository::getInstance();
-                const std::string monitorData = r.getData(this->filter);
+                // Repository &r = Repository::getInstance();
+                // const std::string monitorData = r.getData(this->filter);
+                const std::string monitorData = "Yo wtf ?";
 
                 this->handler->produce(this->topic,
                                        RdKafka::Topic::PARTITION_UA,
                                        RdKafka::Producer::RK_MSG_COPY,
                                        const_cast<char *>(monitorData.c_str()),
                                        monitorData.size(),
-                                       NULL,  // Key
-                                       0,     // Key length
+                                       this->filter->datatype.c_str(),  // Key
+                                       this->filter->datatype.size(),     // Key length
                                        NULL); // Opaque value
                 sleep(this->interval);
-            }
+            // }
         }
     };
 };

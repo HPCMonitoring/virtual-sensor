@@ -5,9 +5,7 @@
 
 namespace myutil
 {
-
-std::string strReplace(std::string source, std::string target, std::string replacement);
-
+    std::string strReplace(std::string source, std::string target, std::string replacement);
 };
 
 #endif
