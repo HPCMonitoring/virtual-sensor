@@ -38,6 +38,7 @@ void ConfigHandler::handle(ClientConnector *responder, const WsMessage &msg) {
 
             responder->send(response);
         } catch (std::exception& exception) {
+            std::cout << exception.what();
             // TODO: handle parse fail exception
         }
     }

@@ -1,5 +1,9 @@
 #include "message_producer.h"
 #include "exceptions.h"
+#include "repository.h"
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
 
 MessageProducer::MessageProducer(const std::string &clientId, const std::string &brokerUrl)
 {
@@ -43,7 +47,7 @@ MessageProducer::Worker::Worker(RdKafka::Producer *handler, WorkerProp *prop) {
     RdKafka::Topic *topic = RdKafka::Topic::create(handler, this->prop->topicName, NULL, errMsg);
     this->topic = topic;
     this->handler = handler;
-    this->job = std::thread(&MessageProducer::Worker::_sendMessage, this, "Hello world !");
+    this->job = std::thread(&MessageProducer::Worker::_sendMessage, this);
 }
 
 void MessageProducer::removeWorker(const std::string &topicName)
@@ -62,19 +66,28 @@ MessageProducer::WorkerProp *MessageProducer::Worker::getProp() {
     return this->prop;
 }
 
-void MessageProducer::Worker::_sendMessage(const std::string &msg) {
+void MessageProducer::Worker::_sendMessage() {
+    Repository &r = Repository::getInstance();
 
     while (stopFlag == false)
     {
-        /* code */
-        this->handler->produce(this->topic,
-                               RdKafka::Topic::PARTITION_UA,
-                               RdKafka::Producer::RK_MSG_COPY,
-                               const_cast<char *>(msg.c_str()),
-                               msg.size(),
-                               NULL,  // Key
-                               0,     // Key length
-                               NULL); // Opaque value
+        try {
+            json stats = json::parse(r.getData(*this->prop->filter)).get<std::vector<json>>();
+            for (auto stat : stats) {
+                const std::string message = stat.dump();
+                this->handler->produce(this->topic,
+                                       RdKafka::Topic::PARTITION_UA,
+                                       RdKafka::Producer::RK_MSG_COPY,
+                                       const_cast<char *>(message.c_str()),
+                                       message.size(),
+                                       NULL,  // Key
+                                       0,     // Key length
+                                       NULL); // Opaque value
+            }
+        } catch (std::exception &exception) {
+            // TODO: SPD log error here
+            std::cout << exception.what();
+        }
         sleep(this->prop->interval);
     }
 

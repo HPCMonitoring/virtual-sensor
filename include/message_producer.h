@@ -39,7 +39,7 @@ public:
         ~Worker();
 
     private:
-        void _sendMessage(const std::string &msg);
+        void _sendMessage();
     };
 
     class WorkerProp {
