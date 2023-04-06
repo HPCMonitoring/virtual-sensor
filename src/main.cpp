@@ -1,18 +1,10 @@
 #include "recorder.h"
 
-std::atomic<bool> terminateFlag;
+std::atomic<bool> terminateFlag(false);
+std::thread mainThread;
 
-void handler(int signal)
+void mainThreadHandler()
 {
-    std::cout << "Terminating with exit code " << signal << " ...\n";
-    terminateFlag = true;
-}
-
-int main(int argc, char *argv[])
-{
-    signal(SIGINT, handler);
-
-    terminateFlag = false;
     Recorder recorder("1915940", "localhost:9092");
 
     std::vector<Attribute> projection;
@@ -28,6 +20,22 @@ int main(int argc, char *argv[])
 
     recorder.addWorker("hello-world", &filter, 5);
 
-    while (!terminateFlag);
+    while (false == terminateFlag.load(std::memory_order_acquire))
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    std::cout << "Cleaning resources before exitting ...\n";
+}
+
+void signalHandler(int signal)
+{
+    std::cout << "\nInterrupt signal (" << signal << ") received.\n";
+    terminateFlag.store(true, std::memory_order_release);
+}
+
+int main(int argc, char *argv[])
+{
+    signal(SIGINT, signalHandler);
+    mainThread = std::thread(mainThreadHandler);
+    mainThread.join();
     return 0;
 }

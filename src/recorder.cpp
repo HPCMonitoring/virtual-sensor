@@ -22,7 +22,6 @@ Recorder::~Recorder()
     std::unordered_map<std::string, Recorder::Worker *>::iterator i;
     for (i = this->workers.begin(); i != this->workers.end(); i++)
     {
-        std::cout << "Destroy work on topic " << i->first << std::endl;
         delete i->second;
     }
     this->producer->flush(5000);
@@ -57,8 +56,7 @@ Recorder::Worker::Worker(
     this->filter = filter;
     this->interval = interval;
     this->stopFlag = false;
-    // this->job = std::thread(&Recorder::Worker::_sendMessage, this);
-    this->_sendMessage();
+    this->job = std::thread(&Recorder::Worker::_sendMessage, this);
 }
 
 Recorder::Worker *Recorder::getWorker(const std::string &topicName) const
@@ -68,8 +66,8 @@ Recorder::Worker *Recorder::getWorker(const std::string &topicName) const
 
 Recorder::Worker::~Worker()
 {
-    // Gracefully terminate program
-    this->stopFlag = true;
-    // this->job.join();
+    // Gracefully terminate thread
+    this->stopFlag.store(true, std::memory_order_release);
+    this->job.join();
     delete this->topic;
 }
