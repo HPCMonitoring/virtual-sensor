@@ -1,32 +1,30 @@
-#include "message_producer.h"
+#include "recorder.h"
 #include "exceptions.h"
 #include "repository.h"
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
-MessageProducer::MessageProducer(const std::string &clientId, const std::string &brokerUrl)
+Recorder::Recorder(const std::string &clientId, const std::string &brokerUrl)
 {
     std::string errstr;
     RdKafka::Conf *conf = RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL);
-
     conf->set("client.id", clientId, errstr);
     conf->set("bootstrap.servers", brokerUrl, errstr);
 
     RdKafka::Producer *kafkaProducer = RdKafka::Producer::create(conf, errstr);
 
     if (!kafkaProducer)
-    {
         throw std::runtime_error(ERR_CREATE_PRODUCER + errstr);
-    }
 
     this->producer = kafkaProducer;
     delete conf;
 }
 
-MessageProducer::~MessageProducer()
+Recorder::~Recorder()
 {
-    for (std::unordered_map<std::string, MessageProducer::Worker *>::iterator i = this->workers.begin(); i != this->workers.end(); i++)
+    std::unordered_map<std::string, Recorder::Worker *>::iterator i;
+    for (i = this->workers.begin(); i != this->workers.end(); i++)
     {
         i->second->stop();
     }
@@ -34,47 +32,38 @@ MessageProducer::~MessageProducer()
     delete this->producer;
 }
 
-MessageProducer::Worker *MessageProducer::createWorker(MessageProducer::WorkerProp *prop)
+Recorder::Worker *Recorder::addWorker(Recorder::WorkerProp *prop)
 {
-    MessageProducer::Worker *worker = new MessageProducer::Worker(producer, prop);
+    Recorder::Worker *worker = new Recorder::Worker(producer, prop);
     this->workers.insert({prop->topicName, worker});
     return worker;
 }
 
-MessageProducer::Worker::Worker(RdKafka::Producer *handler, WorkerProp *prop) {
+Recorder::Worker::Worker(RdKafka::Producer *handler, WorkerProp *prop)
+{
     std::string errMsg;
     this->prop = prop;
     RdKafka::Topic *topic = RdKafka::Topic::create(handler, this->prop->topicName, NULL, errMsg);
     this->topic = topic;
     this->handler = handler;
     this->stopFlag = false;
-    this->job = std::thread(&MessageProducer::Worker::_sendMessage, this);
+    this->job = std::thread(&Recorder::Worker::_sendMessage, this);
     this->job.detach();
 }
 
-void MessageProducer::removeWorker(const std::string &topicName)
-{
-    MessageProducer::Worker *worker = this->workers.at(topicName);
-    delete worker;
-    this->workers.erase(topicName);
-}
-
-MessageProducer::Worker *MessageProducer::getWorker(const std::string &topicName) const
+Recorder::Worker *Recorder::getWorker(const std::string &topicName) const
 {
     return this->workers.at(topicName);
 }
 
-MessageProducer::WorkerProp *MessageProducer::Worker::getProp() {
-    return this->prop;
-}
-
-void MessageProducer::Worker::_sendMessage() {
+void Recorder::Worker::_sendMessage()
+{
     Repository &r = Repository::getInstance();
 
-    while (stopFlag == false)
+    while (!this->stopFlag.load(std::memory_order_acquire))
     {
         try {
-            json stats = json::parse(r.getData(*this->prop->filter)).get<std::vector<json>>();
+            json stats = json::parse(r.getData(this->prop->filter)).get<std::vector<json>>();
             for (auto stat : stats) {
                 const std::string message = stat.dump();
                 this->handler->produce(this->topic,
@@ -97,23 +86,23 @@ void MessageProducer::Worker::_sendMessage() {
     delete this;
 }
 
-void MessageProducer::Worker::stop() {
+void Recorder::Worker::stop() {
     this->stopFlag = true;
 }
 
-MessageProducer::Worker::~Worker()
+Recorder::Worker::~Worker()
 {
-    // Gracefully terminate program
-    this->stopFlag = true;
+    // Gracefully terminate thread
+    this->stopFlag.store(true, std::memory_order_release);
     delete this->topic;
     delete this->prop;
 }
 
-MessageProducer::WorkerProp::WorkerProp(const std::string &topicName, Filter *filter, const time_t interval) :
+Recorder::WorkerProp::WorkerProp(const std::string &topicName, Filter *filter, const time_t interval) :
         topicName(topicName), filter(filter), interval(interval) {
     // do nothing
 }
 
-MessageProducer::WorkerProp::~WorkerProp() {
+Recorder::WorkerProp::~WorkerProp() {
     delete this->filter;
 }

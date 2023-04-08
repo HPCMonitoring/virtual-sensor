@@ -73,7 +73,7 @@ bool RelationalExpr::validate(Process *proc) const
             compareValueStr = proc->getIoRead();
         else if (this->operand == N_IOW)
             compareValueStr = proc->getIoWrite();
-        
+
         const double compareValue = compareValueStr.length() > 0 ? std::stod(compareValueStr) : -1.0;
         const double literalValue = std::stod(this->literal);
         return compare<double>(compareValue, literalValue, this->op);
@@ -81,7 +81,7 @@ bool RelationalExpr::validate(Process *proc) const
 
     return false;
 }
-void RelationalExpr::print()
+void RelationalExpr::print() const
 {
     std::cout << '(' << this->op << ' ' << this->operand << ' ' << this->literal << ')';
 }
@@ -93,6 +93,10 @@ LogicalExpr::LogicalExpr(const std::string &op, const ushort numOfSubExprs)
 }
 std::string LogicalExpr::findPid()
 {
+    // Only find if PID is under AND condition
+    if (this->op == OR_OP)
+        return "";
+
     for (size_t i = 0; i < this->subExprs.size(); ++i)
     {
         const std::string pid = this->subExprs.at(i)->findPid();
@@ -105,21 +109,27 @@ std::string LogicalExpr::findPid()
 }
 bool LogicalExpr::validate(Process *proc) const
 {
-    if(this->op == AND_OP) {
-        for(size_t i = 0; i < numSubOfExprs; ++i) {
-            if(!this->subExprs.at(i)->validate(proc)) return false;
+    if (this->op == AND_OP)
+    {
+        for (size_t i = 0; i < numSubOfExprs; ++i)
+        {
+            if (!this->subExprs.at(i)->validate(proc))
+                return false;
         }
         return true;
     }
-    if(this->op == OR_OP) {
-        for(size_t i = 0; i < numSubOfExprs; ++i) {
-            if(this->subExprs.at(i)->validate(proc)) return true;
+    if (this->op == OR_OP)
+    {
+        for (size_t i = 0; i < numSubOfExprs; ++i)
+        {
+            if (this->subExprs.at(i)->validate(proc))
+                return true;
         }
         return false;
     }
     return false;
 }
-void LogicalExpr::print()
+void LogicalExpr::print() const
 {
     std::cout << '(' << this->op << ' ' << this->numSubOfExprs << ' ';
     for (size_t i = 0; i < this->subExprs.size(); ++i)

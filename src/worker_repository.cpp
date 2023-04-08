@@ -14,16 +14,16 @@ void WorkerRepository::clearAll() {
     this->producers.clear();
 }
 
-void WorkerRepository::addWorker(std::string brokerUrl, MessageProducer::WorkerProp *prop) {
+void WorkerRepository::addWorker(std::string brokerUrl, Recorder::WorkerProp *prop) {
     auto iter = this->producers.find(brokerUrl);
     if (iter == this->producers.end()) {
         // TODO: replace hard code clientId here
-        auto producer = new MessageProducer("sensor-manager-api", brokerUrl);
+        auto producer = new Recorder("sensor-manager-api", brokerUrl);
         this->producers.insert({brokerUrl, producer});
     }
 
     auto producer = this->producers.at(brokerUrl);
-    producer->createWorker(prop);
+    producer->addWorker(prop);
 
 }
 

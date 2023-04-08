@@ -95,19 +95,30 @@ std::string Process::getCommand()
 
 std::string Process::getVirtualMemoryUsage()
 {
-    return this->_readProcessInfoFile(ProcessStatusInfoLine::VM_SIZE);
+    if (this->virtualMemoryUsage.length() > 0)
+        return this->virtualMemoryUsage;
+
+    this->virtualMemoryUsage = this->_readProcessInfoFile(ProcessStatusInfoLine::VM_SIZE);
+    if (this->virtualMemoryUsage.find('/') != std::string::npos || this->virtualMemoryUsage.find('f') != std::string::npos)
+        this->virtualMemoryUsage = "-1";
+    return this->virtualMemoryUsage;
 }
 
 std::string Process::getPhysicalMemoryUsage()
 {
-    return this->_readProcessInfoFile(ProcessStatusInfoLine::RSS);
+    if (this->physicalMemoryUsage.length() > 0)
+        return this->physicalMemoryUsage;
+    this->physicalMemoryUsage = this->_readProcessInfoFile(ProcessStatusInfoLine::RSS);
+    if (this->physicalMemoryUsage.find('/') != std::string::npos || this->physicalMemoryUsage.find('f') != std::string::npos)
+        this->physicalMemoryUsage = "-1";
+    return this->physicalMemoryUsage;
 }
 
 std::string Process::getCpuTime()
 {
     std::ifstream statFile(this->processEntryDirname + "/stat");
     if (!statFile.is_open())
-        return 0;
+        return "";
 
     std::string line;
     std::getline(statFile, line);
@@ -159,8 +170,9 @@ std::string Process::getCpuUsage()
     }
     pclose(pipe);
 
-    result.pop_back();  // Remove \n character
-    result.erase(0, 1); // Remove whitespace character
+    if (result.length() != 2)
+        result.pop_back(); // Remove \n character
+    result.erase(0, 1);    // Remove whitespace character
     return result;
 }
 
@@ -179,7 +191,6 @@ std::string Process::getNetworkOutBandwidth()
 // TODO
 std::string Process::getIoRead()
 {
-
     return "-1";
 }
 

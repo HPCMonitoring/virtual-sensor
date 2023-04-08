@@ -28,7 +28,7 @@ void ConfigHandler::handle(ClientConnector *responder, const WsMessage &msg) {
             }
 
             auto *filter = new Filter(PROCESS, projection, prefixCommand);
-            auto *workerProp = new MessageProducer::WorkerProp(topicName, filter, interval);
+            auto *workerProp = new Recorder::WorkerProp(topicName, filter, interval);
             WorkerRepository::getInstance()->addWorker(brokerUrl, workerProp);
 
             // Send response message

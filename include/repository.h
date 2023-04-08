@@ -19,7 +19,7 @@ private:
 
 public:
     static Repository &getInstance();
-    std::string getData(const Filter &);
+    std::string getData(const Filter*);
 
 private:
     std::vector<pid_t> getAllPids()

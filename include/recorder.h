@@ -4,7 +4,7 @@
 #include "main.h"
 #include "filter.h"
 
-class MessageProducer
+class Recorder
 {
 public:
     class Worker;
@@ -14,14 +14,13 @@ private:
     RdKafka::Producer *producer;
     // Hashmap topic name -> worker
     std::unordered_map<std::string, Worker *> workers;
-    MessageProducer(const MessageProducer &) = delete;
+    Recorder(const Recorder &) = delete;
 
 public:
-    MessageProducer(const std::string &clientId, const std::string &brokerUrl);
-    Worker *createWorker(WorkerProp *);
-    void removeWorker(const std::string &topicName);
+    Recorder(const std::string &clientId, const std::string &brokerUrl);
+    Worker *addWorker(WorkerProp *prop);
     Worker *getWorker(const std::string &topicName) const;
-    ~MessageProducer();
+    ~Recorder();
 
 public:
     class Worker
@@ -34,13 +33,13 @@ public:
         std::atomic<bool> stopFlag;
 
     public:
-        Worker(RdKafka::Producer *, WorkerProp *);
-        WorkerProp* getProp();
+        Worker(RdKafka::Producer *, WorkerProp *prop);
         void stop();
         ~Worker();
 
     private:
         void _sendMessage();
+
     };
 
     class WorkerProp {

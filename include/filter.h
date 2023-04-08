@@ -30,6 +30,10 @@ public:
         this->name = name;
         this->alias = alias;
     }
+    Attribute(const std::string & name) {
+        this->name = name;
+        this->alias = "";
+    }
 };
 
 class Expr
@@ -38,7 +42,7 @@ protected:
     std::string op;
 
 public:
-    virtual void print() = 0;
+    virtual void print() const = 0;
     virtual std::string findPid() = 0;
     virtual bool validate(Process*) const = 0;
     virtual ~Expr(){};
@@ -53,7 +57,7 @@ public:
 
 public:
     RelationalExpr(const std::string &op, const std::string &operand, const std::string &literal);
-    void print();
+    void print() const;
     bool validate(Process*) const;
     std::string findPid();
 };
@@ -66,7 +70,7 @@ public:
 
 public:
     LogicalExpr(const std::string &op, const ushort numOfSubExprs);
-    void print();
+    void print() const;
     std::string findPid();
     bool validate(Process*) const;
     ~LogicalExpr();

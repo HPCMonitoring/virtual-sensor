@@ -3,13 +3,13 @@
 
 #include <list>
 #include <mutex>
-#include "message_producer.h"
+#include "recorder.h"
 
 class WorkerRepository {
 protected:
     static WorkerRepository* _singleton;
     static std::mutex _singletonMutex;
-    std::unordered_map<std::string, MessageProducer*> producers;
+    std::unordered_map<std::string, Recorder*> producers;
     WorkerRepository();
 public:
     static WorkerRepository *getInstance();
@@ -18,7 +18,7 @@ public:
     void operator=(const WorkerRepository &) = delete;
 
     void clearAll();
-    void addWorker(std::string brokerUrl, MessageProducer::WorkerProp *);
+    void addWorker(std::string brokerUrl, Recorder::WorkerProp *);
 
 };
 #endif //VIRTUAL_SENSOR_WORKER_REPOSITORY_H
