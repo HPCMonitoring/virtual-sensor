@@ -1,7 +1,7 @@
 all:
 	mkdir -p build && cd build && cmake .. && cmake --build . && cp ./vsensor ../vsensor
 test_memory_leak:
-	valgrind -s --tool=memcheck ./vsensor
+	sudo valgrind -s --tool=memcheck --leak-check=full ./vsensor
 clean_git:
 	git branch --merged >/tmp/merged-branches && nano /tmp/merged-branches && xargs git branch -D </tmp/merged-branches && git fetch --prune --all
 

@@ -2,6 +2,7 @@
 #define __FILTER_H__
 
 #include "main.h"
+#include "process.h"
 
 #define AND_OP "&&"
 #define OR_OP "||"
@@ -12,14 +13,38 @@
 #define GTE_OP ">="
 #define LIKE_OP "%="
 
+#define PROCESS "process"
+#define NETWORK_INTERFACE "network_interface"
+#define MEMORY "memory"
+#define CPU "cpu"
+#define IO "io"
+#define DISK "disk"
+
+class Attribute
+{
+public:
+    std::string name;
+    std::string alias;
+    Attribute(const std::string &name, const std::string &alias)
+    {
+        this->name = name;
+        this->alias = alias;
+    }
+    Attribute(const std::string & name) {
+        this->name = name;
+        this->alias = "";
+    }
+};
+
 class Expr
 {
 protected:
     std::string op;
 
 public:
-    virtual bool check() = 0;
-    virtual void print() = 0;
+    virtual void print() const = 0;
+    virtual std::string findPid() = 0;
+    virtual bool validate(Process*) const = 0;
     virtual ~Expr(){};
 };
 
@@ -32,8 +57,9 @@ public:
 
 public:
     RelationalExpr(const std::string &op, const std::string &operand, const std::string &literal);
-    bool check();
-    void print();
+    void print() const;
+    bool validate(Process*) const;
+    std::string findPid();
 };
 
 class LogicalExpr : public Expr
@@ -44,8 +70,9 @@ public:
 
 public:
     LogicalExpr(const std::string &op, const ushort numOfSubExprs);
-    bool check();
-    void print();
+    void print() const;
+    std::string findPid();
+    bool validate(Process*) const;
     ~LogicalExpr();
 };
 
@@ -53,14 +80,16 @@ class Filter
 {
 public:
     std::string datatype;
-    std::vector<std::string> fields;
-    Expr *whereCondition;
+    std::vector<Attribute> projection;
+    Expr *selection;
 
 private:
     Filter();
 
 public:
-    Filter(const std::string &datatype, const std::string &fields, const std::string &whereCondition);
+    Filter(const std::string &datatype, const std::vector<Attribute> &projection);
+    Filter(const std::string &datatype, const std::vector<Attribute> &projection, const std::string &selection);
+    std::string iterate(Process *) const;
     void print();
     ~Filter();
 };

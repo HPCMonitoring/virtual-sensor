@@ -10,6 +10,21 @@ Install [`librdkafka`](https://github.com/confluentinc/librdkafka):
 sudo apt install librdkafka-dev
 ```
 
+Install [`spdlog`](https://github.com/gabime/spdlog):
+
+```bash
+sudo apt install libspdlog-dev
+```
+
+Install [`ixwebsocket`](https://machinezone.github.io/IXWebSocket/build/)
+
+```bash
+cd IXWebSocket
+cmake -DBUILD_SHARED_LIBS=ON
+make -j
+make install
+```
+
 ## Some commands
 
 Build to binary:

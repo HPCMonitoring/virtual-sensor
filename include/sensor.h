@@ -3,14 +3,13 @@
 
 #include "main.h"
 #include "process.h"
-#include "common.h"
-#include "message_producer.h"
+#include "recorder.h"
 
 class Sensor
 {
 private:
     // Hashmap kafka server url -> kafka producer
-    std::unordered_map<std::string, MessageProducer*> kafkaProducers;
+    std::unordered_map<std::string, Recorder*> kafkaProducers;
     std::string name;
     std::string cluster;
     std::string token;
@@ -20,9 +19,9 @@ private:
 
 public:
     Sensor(const std::string& credentialStorePath);
-    MessageProducer* createMsgProducer(const std::string &clientId, const std::string &brokerUrl);
+    Recorder* createMsgProducer(const std::string &clientId, const std::string &brokerUrl);
     void removeMsgProducer(const std::string &brokerUrl);
-    MessageProducer* getMsgProducer(const std::string &brokerUrl);
+    Recorder* getMsgProducer(const std::string &brokerUrl);
     void connect();
     ~Sensor();
 };
