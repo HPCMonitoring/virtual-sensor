@@ -67,5 +67,7 @@ std::string Repository::getData(const Filter *filter)
     if (result.back() == ',')
         result.pop_back();
     result.push_back(']');
+    std::transform(result.begin(), result.end(), result.begin(),
+                   [](char c) { return  std::iscntrl(c) ? ' ' : c;});
     return result;
 }

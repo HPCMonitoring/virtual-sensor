@@ -3,12 +3,12 @@
 
 #include "main.h"
 #include "filter.h"
-#include "repository.h"
 
 class Recorder
 {
 public:
     class Worker;
+    class WorkerProp;
 
 private:
     RdKafka::Producer *producer;
@@ -18,7 +18,7 @@ private:
 
 public:
     Recorder(const std::string &clientId, const std::string &brokerUrl);
-    Worker *addWorker(const std::string &topicName, Filter *filter, const time_t interval);
+    Worker *addWorker(WorkerProp *prop);
     Worker *getWorker(const std::string &topicName) const;
     ~Recorder();
 
@@ -28,36 +28,30 @@ public:
     private:
         RdKafka::Producer *handler;
         RdKafka::Topic *topic;
-        std::string topicName;
-        Filter *filter;
-        time_t interval;
+        WorkerProp* prop;
         std::thread job;
         std::atomic<bool> stopFlag;
 
     public:
-        Worker(RdKafka::Producer *, const std::string &, Filter *, const time_t);
+        Worker(RdKafka::Producer *, WorkerProp *prop);
+        void stop();
         ~Worker();
 
     private:
-        void _sendMessage()
-        {
-            while (!this->stopFlag.load(std::memory_order_acquire))
-            {
-                Repository &r = Repository::getInstance();
-                const std::string monitorData = r.getData(this->filter);
+        void _sendMessage();
 
-                this->handler->produce(this->topic,
-                                       RdKafka::Topic::PARTITION_UA,
-                                       RdKafka::Producer::RK_MSG_COPY,
-                                       const_cast<char *>(monitorData.c_str()),
-                                       monitorData.size(),
-                                       this->filter->datatype.c_str(), // Key
-                                       this->filter->datatype.size(),  // Key length
-                                       NULL);                          // Opaque value
-                sleep(this->interval);
-            }
-        }
     };
+
+    class WorkerProp {
+    public:
+        const std::string topicName;
+        const Filter *filter;
+        const time_t interval;
+        WorkerProp(const std::string &topicName, Filter* filter, const time_t interval);
+        ~WorkerProp();
+    };
+
+
 };
 
 #endif
