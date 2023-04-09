@@ -17,7 +17,7 @@ Recorder::Recorder(const std::string &clientId, const std::string &brokerUrl)
     if (!kafkaProducer)
         throw std::runtime_error(ERR_CREATE_PRODUCER + errstr);
 
-    this->producer = kafkaProducer;
+    this->producer = std::shared_ptr<RdKafka::Producer>(kafkaProducer);
     delete conf;
 }
 
@@ -29,7 +29,6 @@ Recorder::~Recorder()
         i->second->stop();
     }
     this->producer->flush(5000);
-    delete this->producer;
 }
 
 Recorder::Worker *Recorder::addWorker(Recorder::WorkerProp *prop)
@@ -39,11 +38,11 @@ Recorder::Worker *Recorder::addWorker(Recorder::WorkerProp *prop)
     return worker;
 }
 
-Recorder::Worker::Worker(RdKafka::Producer *handler, WorkerProp *prop)
+Recorder::Worker::Worker(std::shared_ptr<RdKafka::Producer> handler, WorkerProp *prop)
 {
     std::string errMsg;
     this->prop = prop;
-    RdKafka::Topic *topic = RdKafka::Topic::create(handler, this->prop->topicName, NULL, errMsg);
+    RdKafka::Topic *topic = RdKafka::Topic::create(handler.get(), this->prop->topicName, NULL, errMsg);
     this->topic = topic;
     this->handler = handler;
     this->stopFlag = false;

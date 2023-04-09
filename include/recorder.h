@@ -11,7 +11,7 @@ public:
     class WorkerProp;
 
 private:
-    RdKafka::Producer *producer;
+    std::shared_ptr<RdKafka::Producer>producer;
     // Hashmap topic name -> worker
     std::unordered_map<std::string, Worker *> workers;
     Recorder(const Recorder &) = delete;
@@ -26,14 +26,14 @@ public:
     class Worker
     {
     private:
-        RdKafka::Producer *handler;
+        std::shared_ptr<RdKafka::Producer> handler;
         RdKafka::Topic *topic;
         WorkerProp* prop;
         std::thread job;
         std::atomic<bool> stopFlag;
 
     public:
-        Worker(RdKafka::Producer *, WorkerProp *prop);
+        Worker(std::shared_ptr<RdKafka::Producer>, WorkerProp *prop);
         void stop();
         ~Worker();
 
