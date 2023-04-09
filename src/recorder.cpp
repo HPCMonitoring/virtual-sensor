@@ -11,6 +11,9 @@ Recorder::Recorder(const std::string &clientId, const std::string &brokerUrl)
     RdKafka::Conf *conf = RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL);
     conf->set("client.id", clientId, errstr);
     conf->set("bootstrap.servers", brokerUrl, errstr);
+    conf->set("linger.ms", "500", errstr);
+    conf->set("compression.type", "snappy", errstr);
+    conf->set("acks", "0", errstr);
 
     RdKafka::Producer *kafkaProducer = RdKafka::Producer::create(conf, errstr);
 
