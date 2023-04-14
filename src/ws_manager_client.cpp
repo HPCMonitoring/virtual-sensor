@@ -119,7 +119,6 @@ void SensorManagerClient::setupAndStart()
             boost::str(boost::format("websocket client run done and start re-run in next %d sec") % this->_nextConnRetry));
         std::this_thread::sleep_for (std::chrono::seconds(this->_nextConnRetry));
     }
-
 }
 
 void SensorManagerClient::send(const WsMessage &res)

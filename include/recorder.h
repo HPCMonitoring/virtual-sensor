@@ -33,7 +33,7 @@ public:
         std::atomic<bool> stopFlag;
 
     public:
-        Worker(RdKafka::Producer *, WorkerProp *prop);
+        Worker(RdKafka::Producer *, WorkerProp *);
         void stop();
         ~Worker();
 
@@ -50,8 +50,6 @@ public:
         WorkerProp(const std::string &topicName, Filter* filter, const time_t interval);
         ~WorkerProp();
     };
-
-
 };
 
 #endif

@@ -1,9 +1,6 @@
 #include "recorder.h"
 #include "exceptions.h"
 #include "repository.h"
-#include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
 
 Recorder::Recorder(const std::string &clientId, const std::string &brokerUrl)
 {
@@ -63,14 +60,14 @@ void Recorder::Worker::_sendMessage()
     while (!this->stopFlag.load(std::memory_order_acquire))
     {
         try {
-            json stats = json::parse(r.getData(this->prop->filter)).get<std::vector<json>>();
-            for (auto stat : stats) {
-                const std::string message = stat.dump();
+            std::vector<std::string> records = r.getData(this->prop->filter);
+            const size_t numOfRecords = records.size();
+            for (size_t i = 0; i < numOfRecords; ++i) {
                 this->handler->produce(this->topic,
                                        RdKafka::Topic::PARTITION_UA,
                                        RdKafka::Producer::RK_MSG_COPY,
-                                       const_cast<char *>(message.c_str()),
-                                       message.size(),
+                                       const_cast<char *>(records.at(i).c_str()),
+                                       records.at(i).size(),
                                        NULL,  // Key
                                        0,     // Key length
                                        NULL); // Opaque value

@@ -20,9 +20,10 @@ Repository &Repository::getInstance()
     return instance;
 }
 
-std::string Repository::getData(const Filter *filter)
+std::vector<std::string> Repository::getData(const Filter *filter)
 {
-    std::string result = "[";
+    std::vector<std::string> results;
+    // std::string result = "[";
 
     if (filter->datatype == PROCESS)
     {
@@ -32,7 +33,7 @@ std::string Repository::getData(const Filter *filter)
             const pid_t pid = std::stoi(pidLiteral);
             Process proc(pid);
             if (proc.exists() && filter->selection->validate(&proc))
-                result.append(filter->iterate(&proc));
+                results.push_back(filter->iterate(&proc));
         }
         else
         {
@@ -44,8 +45,7 @@ std::string Repository::getData(const Filter *filter)
                 if (!proc.exists() || !filter->selection->validate(&proc))
                     continue;
 
-                result.append(filter->iterate(&proc));
-                result.push_back(',');
+                results.push_back(filter->iterate(&proc));
             }
         }
     }
@@ -64,10 +64,6 @@ std::string Repository::getData(const Filter *filter)
     else if (filter->datatype == DISK)
     {
     }
-    if (result.back() == ',')
-        result.pop_back();
-    result.push_back(']');
-    std::transform(result.begin(), result.end(), result.begin(),
-                   [](char c) { return  std::iscntrl(c) ? ' ' : c;});
-    return result;
+
+    return results;
 }

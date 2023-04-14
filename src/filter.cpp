@@ -271,6 +271,9 @@ std::string Filter::iterate(Process *proc) const
     }
 
     result.push_back('}');
+    std::transform(result.begin(), result.end(), result.begin(),
+                   [](char c)
+                   { return std::iscntrl(c) ? ' ' : c; });
     return result;
 }
 inline void Filter::print()
