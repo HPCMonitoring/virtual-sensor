@@ -2,7 +2,7 @@
 #define __FILTER_H__
 
 #include "main.h"
-#include "process.h"
+#include "schema/process.h"
 
 #define AND_OP "&&"
 #define OR_OP "||"

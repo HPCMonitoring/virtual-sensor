@@ -1,6 +1,7 @@
-# include <handlers/sys_info_handler.h>
+#include <handlers/sys_info_handler.h>
 
-void SysInfoHandler::handle(ClientConnector *responder, const WsMessage& message) {
+void SysInfoHandler::handle(ClientConnector *responder, const WsMessage &message)
+{
     auto *sysInfo = new SysInfo();
     sysInfo->kernelName = "Linux";
     sysInfo->kernelVersion = "5.19.0-32-generic";

@@ -3,8 +3,6 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 
-#ifdef __SENSOR_LOGGER__
-
 SensorLogger *SensorLogger::_singleton = nullptr;
 std::mutex SensorLogger::_singletonMutex;
 const std::string SensorLogger::ROOT_LOGGER_NAME = "ROOT_LOGGER";
@@ -71,5 +69,3 @@ SensorLogger *SensorLogger::getInstance()
     }
     return _singleton;
 }
-
-#endif

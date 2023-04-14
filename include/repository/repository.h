@@ -2,7 +2,7 @@
 #define __PROCESS_REPOSITORY_H__
 
 #include "main.h"
-#include "filter.h"
+#include "repository/filter.h"
 
 #define PROC_FS "/proc"
 

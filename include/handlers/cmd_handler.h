@@ -1,5 +1,5 @@
-#ifndef VIRTUAL_SENSOR_CMD_HANDLER_H
-#define VIRTUAL_SENSOR_CMD_HANDLER_H
+#ifndef __VIRTUAL_SENSOR_CMD_HANDLER_H__
+#define __VIRTUAL_SENSOR_CMD_HANDLER_H__
 
 
 #include <nlohmann/json.hpp>

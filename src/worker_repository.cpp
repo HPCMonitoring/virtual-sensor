@@ -14,11 +14,11 @@ void WorkerRepository::clearAll() {
     this->producers.clear();
 }
 
-void WorkerRepository::addWorker(std::string brokerUrl, Recorder::WorkerProp *prop) {
+void WorkerRepository::addWorker(std::string brokerUrl, KakfaClient::WorkerProp *prop) {
     auto iter = this->producers.find(brokerUrl);
     if (iter == this->producers.end()) {
         // TODO: replace hard code clientId here
-        auto producer = new Recorder("sensor-manager-api", brokerUrl);
+        auto producer = new KakfaClient("sensor-manager-api", brokerUrl);
         this->producers.insert({brokerUrl, producer});
     }
 

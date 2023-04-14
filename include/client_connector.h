@@ -1,6 +1,6 @@
-#ifndef VIRTUAL_SENSOR_CLIENT_CONNECTOR_H
-#define VIRTUAL_SENSOR_CLIENT_CONNECTOR_H
-#include <handlers/ws_message.h>
+#ifndef __VIRTUAL_SENSOR_CLIENT_CONNECTOR_H__
+#define __VIRTUAL_SENSOR_CLIENT_CONNECTOR_H__
+#include "handlers/ws_message.h"
 
 class ClientConnector {
 public:

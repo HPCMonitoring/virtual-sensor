@@ -23,7 +23,7 @@ SensorManagerClient::SensorManagerClient()
     }
 }
 
-SensorManagerClient *SensorManagerClient::GetInstance()
+SensorManagerClient *SensorManagerClient::getInstance()
 {
     std::lock_guard<std::mutex> lock(_mutex);
     if (_pinstance == nullptr)
@@ -39,10 +39,10 @@ std::string SensorManagerClient::buildConnStr()
 
     std::string spaceReplacement = "%20";
     conn.append(this->_config["server"]).append("/ws").append("?");
-    conn.append("&cluster=").append(myutil::strReplace(this->_config["cluster"], " ", spaceReplacement));
-    conn.append("&name=").append(myutil::strReplace(this->_config["name"], " ", spaceReplacement));
+    conn.append("&cluster=").append(utils::strReplace(this->_config["cluster"], " ", spaceReplacement));
+    conn.append("&name=").append(utils::strReplace(this->_config["name"], " ", spaceReplacement));
     if (this->_config.contains("id")) {
-        conn.append("&id=").append(myutil::strReplace(this->_config["id"], " ", spaceReplacement));
+        conn.append("&id=").append(utils::strReplace(this->_config["id"], " ", spaceReplacement));
     }
     return conn;
 }

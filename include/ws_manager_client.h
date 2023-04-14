@@ -36,7 +36,7 @@ protected:
     void on_close(const ix::WebSocketMessagePtr& msg);
 
 public:
-    static SensorManagerClient *GetInstance();
+    static SensorManagerClient *getInstance();
     SensorManagerClient(SensorManagerClient &other) = delete;
     void operator=(const SensorManagerClient &) = delete;
     void setupAndStart();

@@ -1,5 +1,5 @@
-#ifndef VIRTUAL_SENSOR_PLAINJSONSTR_H
-#define VIRTUAL_SENSOR_PLAINJSONSTR_H
+#ifndef __VIRTUAL_SENSOR_PLAINJSONSTR_H__
+#define __VIRTUAL_SENSOR_PLAINJSONSTR_H__
 
 #include "schema/json_serializable.h"
 #include <string>

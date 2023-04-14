@@ -2,14 +2,14 @@
 #define __SENSOR_H__
 
 #include "main.h"
-#include "process.h"
-#include "recorder.h"
+#include "schema/process.h"
+#include "clients/kafka_client.h"
 
 class Sensor
 {
 private:
     // Hashmap kafka server url -> kafka producer
-    std::unordered_map<std::string, Recorder*> kafkaProducers;
+    std::unordered_map<std::string, KakfaClient*> kafkaProducers;
     std::string name;
     std::string cluster;
     std::string token;
@@ -19,9 +19,9 @@ private:
 
 public:
     Sensor(const std::string& credentialStorePath);
-    Recorder* createMsgProducer(const std::string &clientId, const std::string &brokerUrl);
+    KakfaClient* createMsgProducer(const std::string &clientId, const std::string &brokerUrl);
     void removeMsgProducer(const std::string &brokerUrl);
-    Recorder* getMsgProducer(const std::string &brokerUrl);
+    KakfaClient* getMsgProducer(const std::string &brokerUrl);
     void connect();
     ~Sensor();
 };

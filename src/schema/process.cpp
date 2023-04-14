@@ -1,4 +1,4 @@
-#include "process.h"
+#include "schema/process.h"
 #include "exceptions.h"
 
 inline bool fileExists(const std::string &name)

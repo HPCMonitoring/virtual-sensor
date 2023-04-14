@@ -1,8 +1,8 @@
-#include "recorder.h"
+#include "clients/kafka_client.h"
 #include "exceptions.h"
-#include "repository.h"
+#include "repository/repository.h"
 
-Recorder::Recorder(const std::string &clientId, const std::string &brokerUrl)
+KakfaClient::KakfaClient(const std::string &clientId, const std::string &brokerUrl)
 {
     std::string errstr;
     RdKafka::Conf *conf = RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL);
@@ -18,9 +18,9 @@ Recorder::Recorder(const std::string &clientId, const std::string &brokerUrl)
     delete conf;
 }
 
-Recorder::~Recorder()
+KakfaClient::~KakfaClient()
 {
-    std::unordered_map<std::string, Recorder::Worker *>::iterator i;
+    std::unordered_map<std::string, KakfaClient::Worker *>::iterator i;
     for (i = this->workers.begin(); i != this->workers.end(); i++)
     {
         i->second->stop();
@@ -29,14 +29,14 @@ Recorder::~Recorder()
     delete this->producer;
 }
 
-Recorder::Worker *Recorder::addWorker(Recorder::WorkerProp *prop)
+KakfaClient::Worker *KakfaClient::addWorker(KakfaClient::WorkerProp *prop)
 {
-    Recorder::Worker *worker = new Recorder::Worker(producer, prop);
+    KakfaClient::Worker *worker = new KakfaClient::Worker(producer, prop);
     this->workers.insert({prop->topicName, worker});
     return worker;
 }
 
-Recorder::Worker::Worker(RdKafka::Producer *handler, WorkerProp *prop)
+KakfaClient::Worker::Worker(RdKafka::Producer *handler, WorkerProp *prop)
 {
     std::string errMsg;
     this->prop = prop;
@@ -44,16 +44,16 @@ Recorder::Worker::Worker(RdKafka::Producer *handler, WorkerProp *prop)
     this->topic = topic;
     this->handler = handler;
     this->stopFlag = false;
-    this->job = std::thread(&Recorder::Worker::_sendMessage, this);
+    this->job = std::thread(&KakfaClient::Worker::_sendMessage, this);
     this->job.detach();
 }
 
-Recorder::Worker *Recorder::getWorker(const std::string &topicName) const
+KakfaClient::Worker *KakfaClient::getWorker(const std::string &topicName) const
 {
     return this->workers.at(topicName);
 }
 
-void Recorder::Worker::_sendMessage()
+void KakfaClient::Worker::_sendMessage()
 {
     Repository &r = Repository::getInstance();
 
@@ -83,11 +83,11 @@ void Recorder::Worker::_sendMessage()
     delete this;
 }
 
-void Recorder::Worker::stop() {
+void KakfaClient::Worker::stop() {
     this->stopFlag = true;
 }
 
-Recorder::Worker::~Worker()
+KakfaClient::Worker::~Worker()
 {
     // Gracefully terminate thread
     this->stopFlag.store(true, std::memory_order_release);
@@ -95,11 +95,11 @@ Recorder::Worker::~Worker()
     delete this->prop;
 }
 
-Recorder::WorkerProp::WorkerProp(const std::string &topicName, Filter *filter, const time_t interval) :
+KakfaClient::WorkerProp::WorkerProp(const std::string &topicName, Filter *filter, const time_t interval) :
         topicName(topicName), filter(filter), interval(interval) {
     // do nothing
 }
 
-Recorder::WorkerProp::~WorkerProp() {
+KakfaClient::WorkerProp::~WorkerProp() {
     delete this->filter;
 }

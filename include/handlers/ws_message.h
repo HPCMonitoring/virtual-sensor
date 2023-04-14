@@ -1,5 +1,5 @@
-#ifndef VIRTUAL_SENSOR_WS_MESSAGE_H
-#define VIRTUAL_SENSOR_WS_MESSAGE_H
+#ifndef __VIRTUAL_SENSOR_WS_MESSAGE_H__
+#define __VIRTUAL_SENSOR_WS_MESSAGE_H__
 
 
 #include <string>

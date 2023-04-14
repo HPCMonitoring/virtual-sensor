@@ -1,15 +1,15 @@
-#ifndef VIRTUAL_SENSOR_WORKER_REPOSITORY_H
-#define VIRTUAL_SENSOR_WORKER_REPOSITORY_H
+#ifndef __VIRTUAL_SENSOR_WORKER_REPOSITORY_H__
+#define __VIRTUAL_SENSOR_WORKER_REPOSITORY_H__
 
 #include <list>
 #include <mutex>
-#include "recorder.h"
+#include "clients/kafka_client.h"
 
 class WorkerRepository {
 protected:
     static WorkerRepository* _singleton;
     static std::mutex _singletonMutex;
-    std::unordered_map<std::string, Recorder*> producers;
+    std::unordered_map<std::string, KakfaClient*> producers;
     WorkerRepository();
 public:
     static WorkerRepository *getInstance();
@@ -18,7 +18,7 @@ public:
     void operator=(const WorkerRepository &) = delete;
 
     void clearAll();
-    void addWorker(std::string brokerUrl, Recorder::WorkerProp *);
+    void addWorker(std::string brokerUrl, KakfaClient::WorkerProp *);
 
 };
 #endif //VIRTUAL_SENSOR_WORKER_REPOSITORY_H

@@ -1,4 +1,4 @@
-#include "repository.h"
+#include "repository/repository.h"
 
 bool isProcessDirectory(const std::string &name)
 {
@@ -23,7 +23,6 @@ Repository &Repository::getInstance()
 std::vector<std::string> Repository::getData(const Filter *filter)
 {
     std::vector<std::string> results;
-    // std::string result = "[";
 
     if (filter->datatype == PROCESS)
     {
