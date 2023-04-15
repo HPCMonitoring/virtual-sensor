@@ -4,6 +4,9 @@
 // #include "handlers/sys_info_handler.h"
 // #include "handlers/config_handler.h"
 
+#include "repository/repository.h"
+#include "repository/filter.h"
+
 // std::thread mainThread;
 // SensorManagerClient *client;
 
@@ -31,6 +34,18 @@ int main(int argc, char *argv[])
     // signal(SIGINT, signalHandler);
     // mainThread = std::thread(mainThreadHandler);
     // mainThread.join();
+    std::vector<Attribute> attrs;
+    attrs.push_back(Attribute("name"));
+    attrs.push_back(Attribute("receive", "recv"));
+    attrs.push_back(Attribute("transmit", "sent"));
+
+    Filter filter(NETWORK_INTERFACE, attrs);
+    Repository &r = Repository::getInstance();
+    auto data = r.getData(&filter);
+    for (size_t i = 0; i < data.size(); ++i)
+    {
+        std::cout << data.at(i) << std::endl;
+    }
 
     return 0;
 }

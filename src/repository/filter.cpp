@@ -206,7 +206,7 @@ Filter::Filter(const std::string &datatype, const std::vector<Attribute> &projec
     this->selection = exprStack.top();
     exprStack.pop();
 }
-std::string Filter::iterate(Process *proc) const
+std::string Filter::iterateProc(Process *proc) const
 {
     size_t numOfAttrs = this->projection.size();
     std::string result;
@@ -276,6 +276,89 @@ std::string Filter::iterate(Process *proc) const
                    { return std::iscntrl(c) ? ' ' : c; });
     return result;
 }
+
+std::string Filter::iterateNetworkInterface(const NetworkInterface *networkInterface) const
+{
+    size_t numOfAttrs = this->projection.size();
+    std::ostringstream oss;
+    oss << '{';
+
+    for (size_t i = 0; i < numOfAttrs; ++i)
+    {
+        std::string fieldName = this->projection.at(i).alias.length() > 0 ? this->projection.at(i).alias : this->projection.at(i).name;
+
+        oss << '\"' << fieldName << "\":";
+
+        if (this->projection.at(i).name == "name")
+            oss << '\"' << networkInterface->getName() << '\"';
+        else if (this->projection.at(i).name == "receive")
+        {
+            auto receiveData = networkInterface->getReceiveData();
+            oss << "{";
+            oss << "\""
+                << "bytes"
+                << "\":" << receiveData->bytes << ',';
+            oss << "\""
+                << "packets"
+                << "\":" << receiveData->packets << ',';
+            oss << "\""
+                << "errors"
+                << "\":" << receiveData->errors << ',';
+            oss << "\""
+                << "dropped"
+                << "\":" << receiveData->dropped << ',';
+            oss << "\""
+                << "fifo"
+                << "\":" << receiveData->fifo << ',';
+            oss << "\""
+                << "frame"
+                << "\":" << receiveData->frame << ',';
+            oss << "\""
+                << "compressed"
+                << "\":" << receiveData->compressed << ',';
+            oss << "\""
+                << "multicast"
+                << "\":" << receiveData->multicast;
+            oss << "}";
+        }
+        else if (this->projection.at(i).name == "transmit")
+        {
+            auto transmitData = networkInterface->getTransmitData();
+            oss << "{";
+            oss << "\""
+                << "bytes"
+                << "\":" << transmitData->bytes << ',';
+            oss << "\""
+                << "packets"
+                << "\":" << transmitData->packets << ',';
+            oss << "\""
+                << "errors"
+                << "\":" << transmitData->errors << ',';
+            oss << "\""
+                << "dropped"
+                << "\":" << transmitData->dropped << ',';
+            oss << "\""
+                << "fifo"
+                << "\":" << transmitData->fifo << ',';
+            oss << "\""
+                << "colls"
+                << "\":" << transmitData->colls << ',';
+            oss << "\""
+                << "carrier"
+                << "\":" << transmitData->carrier << ',';
+            oss << "\""
+                << "compressed"
+                << "\":" << transmitData->compressed;
+            oss << "}";
+        }
+        if (i != numOfAttrs - 1)
+            oss << ',';
+    }
+
+    oss << '}';
+    return oss.str();
+}
+
 inline void Filter::print()
 {
     std::cout << "Data type: " << this->datatype << std::endl;

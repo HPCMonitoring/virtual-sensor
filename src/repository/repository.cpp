@@ -32,7 +32,7 @@ std::vector<std::string> Repository::getData(const Filter *filter)
             const pid_t pid = std::stoi(pidLiteral);
             Process proc(pid);
             if (proc.exists() && filter->selection->validate(&proc))
-                results.push_back(filter->iterate(&proc));
+                results.push_back(filter->iterateProc(&proc));
         }
         else
         {
@@ -44,12 +44,25 @@ std::vector<std::string> Repository::getData(const Filter *filter)
                 if (!proc.exists() || !filter->selection->validate(&proc))
                     continue;
 
-                results.push_back(filter->iterate(&proc));
+                results.push_back(filter->iterateProc(&proc));
             }
         }
     }
     else if (filter->datatype == NETWORK_INTERFACE)
     {
+        std::ifstream netfile("/proc/net/dev");
+        if (!netfile.is_open())
+            return results;
+
+        std::string line;
+        std::getline(netfile, line); // skip first line
+        std::getline(netfile, line); // skip second line
+
+        while (std::getline(netfile, line))
+        {
+            NetworkInterface networkInterface(line);
+            results.push_back(filter->iterateNetworkInterface(&networkInterface));
+        }
     }
     else if (filter->datatype == MEMORY)
     {

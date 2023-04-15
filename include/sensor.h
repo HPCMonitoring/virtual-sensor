@@ -2,7 +2,7 @@
 #define __SENSOR_H__
 
 #include "main.h"
-#include "schema/process.h"
+#include "schemas/process.h"
 #include "clients/kafka_client.h"
 
 class Sensor

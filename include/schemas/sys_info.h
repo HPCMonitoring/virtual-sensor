@@ -1,7 +1,7 @@
 #ifndef __VIRTUAL_SENSOR_SYS_INFO_H__
 #define __VIRTUAL_SENSOR_SYS_INFO_H__
 
-#include "schema/json_serializable.h"
+#include "schemas/json_serializable.h"
 
 class SysInfo : public JsonSerializable{
 public:

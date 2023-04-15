@@ -2,7 +2,8 @@
 #define __FILTER_H__
 
 #include "main.h"
-#include "schema/process.h"
+#include "schemas/process.h"
+#include "schemas/network_interface.h"
 
 #define AND_OP "&&"
 #define OR_OP "||"
@@ -89,7 +90,8 @@ private:
 public:
     Filter(const std::string &datatype, const std::vector<Attribute> &projection);
     Filter(const std::string &datatype, const std::vector<Attribute> &projection, const std::string &selection);
-    std::string iterate(Process *) const;
+    std::string iterateProc(Process *) const;
+    std::string iterateNetworkInterface(const NetworkInterface*) const;
     void print();
     ~Filter();
 };
