@@ -35,11 +35,16 @@ int main(int argc, char *argv[])
     // mainThread = std::thread(mainThreadHandler);
     // mainThread.join();
     std::vector<Attribute> attrs;
-    attrs.push_back(Attribute("name"));
-    attrs.push_back(Attribute("receive", "recv"));
-    attrs.push_back(Attribute("transmit", "sent"));
+    attrs.push_back(Attribute("total"));
+    attrs.push_back(Attribute("free"));
+    attrs.push_back(Attribute("available"));
+    attrs.push_back(Attribute("buffers"));
+    attrs.push_back(Attribute("cached"));
+    attrs.push_back(Attribute("swapTotal"));
+    attrs.push_back(Attribute("swapFree"));
+    attrs.push_back(Attribute("swapCached"));
 
-    Filter filter(NETWORK_INTERFACE, attrs);
+    Filter filter(MEMORY, attrs);
     Repository &r = Repository::getInstance();
     auto data = r.getData(&filter);
     for (size_t i = 0; i < data.size(); ++i)

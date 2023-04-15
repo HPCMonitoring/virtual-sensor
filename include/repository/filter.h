@@ -4,6 +4,7 @@
 #include "main.h"
 #include "schemas/process.h"
 #include "schemas/network_interface.h"
+#include "schemas/memory.h"
 
 #define AND_OP "&&"
 #define OR_OP "||"
@@ -92,6 +93,7 @@ public:
     Filter(const std::string &datatype, const std::vector<Attribute> &projection, const std::string &selection);
     std::string iterateProc(Process *) const;
     std::string iterateNetworkInterface(const NetworkInterface*) const;
+    std::string iterateMemory(const Memory*) const;
     void print();
     ~Filter();
 };

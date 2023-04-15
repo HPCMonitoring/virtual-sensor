@@ -63,9 +63,12 @@ std::vector<std::string> Repository::getData(const Filter *filter)
             NetworkInterface networkInterface(line);
             results.push_back(filter->iterateNetworkInterface(&networkInterface));
         }
+        netfile.close();
     }
     else if (filter->datatype == MEMORY)
     {
+        Memory memory = Memory();
+        results.push_back(filter->iterateMemory(&memory));
     }
     else if (filter->datatype == CPU)
     {

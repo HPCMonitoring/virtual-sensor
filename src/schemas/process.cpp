@@ -90,6 +90,7 @@ std::string Process::getCommand()
         return "";
 
     std::getline(cmdLineFile, this->command);
+    cmdLineFile.close();
     return this->command;
 }
 
@@ -146,6 +147,8 @@ std::string Process::getCpuTime()
         index++;
         value.clear();
     }
+
+    statFile.close();
 
     return std::to_string((double)(sysCpuTime + userCpuTime) / CLOCK_PER_MILISECS);
 }

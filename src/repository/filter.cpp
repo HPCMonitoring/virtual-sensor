@@ -375,6 +375,43 @@ inline void Filter::print()
     this->selection->print();
     std::cout << std::endl;
 }
+
+std::string Filter::iterateMemory(const Memory *memory) const
+{
+    size_t numOfAttrs = this->projection.size();
+    std::ostringstream oss;
+    oss << '{';
+
+    for (size_t i = 0; i < numOfAttrs; ++i)
+    {
+        std::string fieldName = this->projection.at(i).alias.length() > 0 ? this->projection.at(i).alias : this->projection.at(i).name;
+
+        oss << '\"' << fieldName << "\":";
+
+        if (this->projection.at(i).name == "total")
+            oss << memory->total;
+        else if (this->projection.at(i).name == "free")
+            oss << memory->free;
+        else if (this->projection.at(i).name == "available")
+            oss << memory->available;
+        else if (this->projection.at(i).name == "buffers")
+            oss << memory->buffers;
+        else if (this->projection.at(i).name == "cached")
+            oss << memory->cached;
+        else if (this->projection.at(i).name == "swapTotal")
+            oss << memory->swapTotal;
+        else if (this->projection.at(i).name == "swapFree")
+            oss << memory->swapFree;
+        else if (this->projection.at(i).name == "swapCached")
+            oss << memory->swapCached;
+        
+        if (i != numOfAttrs - 1)
+            oss << ',';
+    }
+    oss << '}';
+    return oss.str();
+};
+
 Filter::~Filter()
 {
     delete this->selection;
