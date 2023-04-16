@@ -87,6 +87,34 @@ std::vector<std::string> Repository::getData(const Filter *filter)
     }
     else if (filter->datatype == IO)
     {
+        // Run iostat and read its output
+        FILE *pipe = popen("iostat -d -k 1 1", "r");
+        if (!pipe)
+        {
+            std::cerr << "Error: Failed to run iostat command." << std::endl;
+            return results;
+        }
+        char buffer[256];
+        std::string iostatOutput;
+        while (fgets(buffer, sizeof(buffer), pipe) != NULL)
+            iostatOutput += buffer;
+
+        std::stringstream iss(iostatOutput);
+        std::string line;
+        while (std::getline(iss, line))
+        {
+            // Find header line
+            if (line.find("Device") == std::string::npos)
+                continue;
+            break;
+        }
+        // Parse device IO stats from each line
+        while (std::getline(iss, line))
+        {
+            if(line.empty()) break;
+            IOStat io = IOStat(line);
+            results.push_back(filter->iterateIO(&io));
+        }
     }
     else if (filter->datatype == DISK)
     {

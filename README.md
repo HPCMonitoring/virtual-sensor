@@ -25,6 +25,12 @@ make -j
 make install
 ```
 
+Install `sysstat`:
+
+```bash
+sudo apt install sysstat
+```
+
 ## Some commands
 
 Build to binary:

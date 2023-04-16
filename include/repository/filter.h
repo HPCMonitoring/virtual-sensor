@@ -6,6 +6,7 @@
 #include "schemas/network_interface.h"
 #include "schemas/memory.h"
 #include "schemas/cpu.h"
+#include "schemas/io.h"
 
 #define AND_OP "&&"
 #define OR_OP "||"
@@ -96,6 +97,7 @@ public:
     std::string iterateNetworkInterface(const NetworkInterface*) const;
     std::string iterateMemory(const Memory*) const;
     std::string iterateCpu(const Cpu*) const;
+    std::string iterateIO(const IOStat*) const;
     void print();
     ~Filter();
 };

@@ -452,6 +452,40 @@ std::string Filter::iterateCpu(const Cpu *cpu) const
     return oss.str();
 }
 
+std::string Filter::iterateIO(const IOStat *io) const
+{
+    size_t numOfAttrs = this->projection.size();
+    std::ostringstream oss;
+    oss << '{';
+    for (size_t i = 0; i < numOfAttrs; ++i)
+    {
+        std::string fieldName = this->projection.at(i).alias.length() > 0 ? this->projection.at(i).alias : this->projection.at(i).name;
+        oss << '\"' << fieldName << "\":";
+
+        if (this->projection.at(i).name == "device")
+            oss << '\"' << io->device << '\"';
+        else if (this->projection.at(i).name == "tps")
+            oss << io->tps;
+        else if (this->projection.at(i).name == "readPerSec")
+            oss << io->readPerSec;
+        else if (this->projection.at(i).name == "read")
+            oss << io->read;
+        else if (this->projection.at(i).name == "writePerSec")
+            oss << io->tps;
+        else if (this->projection.at(i).name == "writen")
+            oss << io->writen;
+        else if (this->projection.at(i).name == "discardPerSec")
+            oss << io->discardPerSec;
+        else if (this->projection.at(i).name == "discarded")
+            oss << io->discarded;
+
+        if (i != numOfAttrs - 1)
+            oss << ',';
+    }
+    oss << '}';
+    return oss.str();
+}
+
 Filter::~Filter()
 {
     delete this->selection;
