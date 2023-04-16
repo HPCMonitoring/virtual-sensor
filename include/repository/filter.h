@@ -5,6 +5,7 @@
 #include "schemas/process.h"
 #include "schemas/network_interface.h"
 #include "schemas/memory.h"
+#include "schemas/cpu.h"
 
 #define AND_OP "&&"
 #define OR_OP "||"
@@ -94,6 +95,7 @@ public:
     std::string iterateProc(Process *) const;
     std::string iterateNetworkInterface(const NetworkInterface*) const;
     std::string iterateMemory(const Memory*) const;
+    std::string iterateCpu(const Cpu*) const;
     void print();
     ~Filter();
 };

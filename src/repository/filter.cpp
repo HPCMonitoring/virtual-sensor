@@ -404,13 +404,53 @@ std::string Filter::iterateMemory(const Memory *memory) const
             oss << memory->swapFree;
         else if (this->projection.at(i).name == "swapCached")
             oss << memory->swapCached;
-        
+
         if (i != numOfAttrs - 1)
             oss << ',';
     }
     oss << '}';
     return oss.str();
 };
+
+std::string Filter::iterateCpu(const Cpu *cpu) const
+{
+    size_t numOfAttrs = this->projection.size();
+    std::ostringstream oss;
+    oss << '{';
+    for (size_t i = 0; i < numOfAttrs; ++i)
+    {
+        std::string fieldName = this->projection.at(i).alias.length() > 0 ? this->projection.at(i).alias : this->projection.at(i).name;
+        oss << '\"' << fieldName << "\":";
+
+        if (this->projection.at(i).name == "order")
+            oss << cpu->order;
+        else if (this->projection.at(i).name == "user")
+            oss << cpu->user;
+        else if (this->projection.at(i).name == "nice")
+            oss << cpu->nice;
+        else if (this->projection.at(i).name == "system")
+            oss << cpu->system;
+        else if (this->projection.at(i).name == "idle")
+            oss << cpu->idle;
+        else if (this->projection.at(i).name == "iowait")
+            oss << cpu->iowait;
+        else if (this->projection.at(i).name == "irq")
+            oss << cpu->irq;
+        else if (this->projection.at(i).name == "softirq")
+            oss << cpu->softirq;
+        else if (this->projection.at(i).name == "steal")
+            oss << cpu->steal;
+        else if (this->projection.at(i).name == "guest")
+            oss << cpu->guest;
+        else if (this->projection.at(i).name == "guestNice")
+            oss << cpu->guestNice;
+
+        if (i != numOfAttrs - 1)
+            oss << ',';
+    }
+    oss << '}';
+    return oss.str();
+}
 
 Filter::~Filter()
 {

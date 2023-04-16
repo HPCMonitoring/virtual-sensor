@@ -35,16 +35,16 @@ int main(int argc, char *argv[])
     // mainThread = std::thread(mainThreadHandler);
     // mainThread.join();
     std::vector<Attribute> attrs;
-    attrs.push_back(Attribute("total"));
-    attrs.push_back(Attribute("free"));
-    attrs.push_back(Attribute("available"));
-    attrs.push_back(Attribute("buffers"));
-    attrs.push_back(Attribute("cached"));
-    attrs.push_back(Attribute("swapTotal"));
-    attrs.push_back(Attribute("swapFree"));
-    attrs.push_back(Attribute("swapCached"));
+    attrs.push_back(Attribute("order"));
+    attrs.push_back(Attribute("user"));
+    attrs.push_back(Attribute("nice"));
+    attrs.push_back(Attribute("system"));
+    attrs.push_back(Attribute("idle"));
+    attrs.push_back(Attribute("iowait"));
+    attrs.push_back(Attribute("irq"));
+    attrs.push_back(Attribute("steal"));
 
-    Filter filter(MEMORY, attrs);
+    Filter filter(CPU, attrs);
     Repository &r = Repository::getInstance();
     auto data = r.getData(&filter);
     for (size_t i = 0; i < data.size(); ++i)

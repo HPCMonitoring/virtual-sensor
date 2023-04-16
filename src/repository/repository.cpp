@@ -72,6 +72,18 @@ std::vector<std::string> Repository::getData(const Filter *filter)
     }
     else if (filter->datatype == CPU)
     {
+        std::ifstream statfile("/proc/stat");
+        if (!statfile.is_open())
+            return results;
+        std::string line;
+        while (std::getline(statfile, line))
+        {
+            if (line.find("cpu") == 0 && line.find("cpu ") != 0)
+            {
+                Cpu cpu = Cpu(line);
+                results.push_back(filter->iterateCpu(&cpu));
+            }
+        }
     }
     else if (filter->datatype == IO)
     {
