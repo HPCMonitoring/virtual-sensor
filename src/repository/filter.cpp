@@ -486,6 +486,36 @@ std::string Filter::iterateIO(const IOStat *io) const
     return oss.str();
 }
 
+std::string Filter::iterateDiskUsage(const DiskUsage *disk) const
+{
+    size_t numOfAttrs = this->projection.size();
+    std::ostringstream oss;
+    oss << '{';
+    for (size_t i = 0; i < numOfAttrs; ++i)
+    {
+        std::string fieldName = this->projection.at(i).alias.length() > 0 ? this->projection.at(i).alias : this->projection.at(i).name;
+        oss << '\"' << fieldName << "\":";
+
+        if (this->projection.at(i).name == "filesystem")
+            oss << '\"' << disk->filesystem << '\"';
+        else if (this->projection.at(i).name == "size")
+            oss << '\"' << disk->size << '\"';
+        else if (this->projection.at(i).name == "used")
+            oss << '\"' << disk->used << '\"';
+        else if (this->projection.at(i).name == "available")
+            oss << '\"' << disk->available << '\"';
+        else if (this->projection.at(i).name == "usedPercentage")
+            oss << '\"' << disk->usedPercentage << '\"';
+        else if (this->projection.at(i).name == "mountedOn")
+            oss << '\"' << disk->mountedOn << '\"';
+
+        if (i != numOfAttrs - 1)
+            oss << ',';
+    }
+    oss << '}';
+    return oss.str();
+}
+
 Filter::~Filter()
 {
     delete this->selection;

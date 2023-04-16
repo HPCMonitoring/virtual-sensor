@@ -7,6 +7,7 @@
 #include "schemas/memory.h"
 #include "schemas/cpu.h"
 #include "schemas/io.h"
+#include "schemas/disk_usage.h"
 
 #define AND_OP "&&"
 #define OR_OP "||"
@@ -22,6 +23,7 @@
 #define MEMORY "memory"
 #define CPU "cpu"
 #define IO "io"
+#define DISK "disk"
 
 class Attribute
 {
@@ -97,6 +99,7 @@ public:
     std::string iterateMemory(const Memory*) const;
     std::string iterateCpu(const Cpu*) const;
     std::string iterateIO(const IOStat*) const;
+    std::string iterateDiskUsage(const DiskUsage *) const;
     void print();
     ~Filter();
 };

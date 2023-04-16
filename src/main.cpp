@@ -35,16 +35,14 @@ int main(int argc, char *argv[])
     // mainThread = std::thread(mainThreadHandler);
     // mainThread.join();
     std::vector<Attribute> attrs;
-    attrs.push_back(Attribute("device"));
-    attrs.push_back(Attribute("tps"));
-    attrs.push_back(Attribute("writePerSec"));
-    attrs.push_back(Attribute("readPerSec"));
-    attrs.push_back(Attribute("writen"));
-    attrs.push_back(Attribute("read"));
-    attrs.push_back(Attribute("discardPerSec"));
-    attrs.push_back(Attribute("discarded"));
+    attrs.push_back(Attribute("filesystem", "fs"));
+    attrs.push_back(Attribute("size"));
+    attrs.push_back(Attribute("used"));
+    attrs.push_back(Attribute("available"));
+    attrs.push_back(Attribute("usedPercentage"));
+    attrs.push_back(Attribute("mountedOn"));
 
-    Filter filter(IO, attrs);
+    Filter filter(DISK, attrs);
     Repository &r = Repository::getInstance();
     auto data = r.getData(&filter);
     for (size_t i = 0; i < data.size(); ++i)

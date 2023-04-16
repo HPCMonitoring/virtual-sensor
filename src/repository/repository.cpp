@@ -116,6 +116,29 @@ std::vector<std::string> Repository::getData(const Filter *filter)
             results.push_back(filter->iterateIO(&io));
         }
     }
+    else if (filter->datatype == DISK)
+    {
+        // Run iostat and read its output
+        FILE *pipe = popen("df -h", "r");
+        if (!pipe)
+        {
+            std::cerr << "Error: Failed to run df command." << std::endl;
+            return results;
+        }
+        char buffer[256];
+        std::string iostatOutput;
+        while (fgets(buffer, sizeof(buffer), pipe) != NULL)
+            iostatOutput += buffer;
+
+        std::stringstream iss(iostatOutput);
+        std::string line;
+        // Skip header line
+        std::getline(iss, line);
+        while(std::getline(iss, line)) {
+            DiskUsage disk = DiskUsage(line);
+            results.push_back(filter->iterateDiskUsage(&disk));
+        }
+    }
 
     return results;
 }
