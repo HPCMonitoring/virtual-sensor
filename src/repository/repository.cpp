@@ -116,9 +116,6 @@ std::vector<std::string> Repository::getData(const Filter *filter)
             results.push_back(filter->iterateIO(&io));
         }
     }
-    else if (filter->datatype == DISK)
-    {
-    }
 
     return results;
 }

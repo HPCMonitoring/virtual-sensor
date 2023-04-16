@@ -22,7 +22,6 @@
 #define MEMORY "memory"
 #define CPU "cpu"
 #define IO "io"
-#define DISK "disk"
 
 class Attribute
 {
