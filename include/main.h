@@ -6,7 +6,6 @@
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h>
-#include <unistd.h>
 #include <climits>
 #include <thread>
 #include <atomic>

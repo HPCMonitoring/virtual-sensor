@@ -76,7 +76,7 @@ void KakfaClient::Worker::_sendMessage()
             // TODO: SPD log error here
             std::cout << exception.what();
         }
-        sleep(this->prop->interval);
+        std::this_thread::sleep_for(std::chrono::seconds(this->prop->interval));
     }
 
     // TODO: must review this delete statement to make code clean and understandable
