@@ -11,4 +11,4 @@ private:
     std::list<KakfaClient::Worker> workers;
     void handle(ClientConnector *responder, const WsMessage& msg) override;
 };
-#endif //VIRTUAL_SENSOR_CONFIG_HANDLER_H
+#endif

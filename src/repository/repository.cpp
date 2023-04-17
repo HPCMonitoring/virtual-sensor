@@ -111,7 +111,8 @@ std::vector<std::string> Repository::getData(const Filter *filter)
         // Parse device IO stats from each line
         while (std::getline(iss, line))
         {
-            if(line.empty()) break;
+            if (line.empty())
+                break;
             IOStat io = IOStat(line);
             results.push_back(filter->iterateIO(&io));
         }
@@ -134,7 +135,8 @@ std::vector<std::string> Repository::getData(const Filter *filter)
         std::string line;
         // Skip header line
         std::getline(iss, line);
-        while(std::getline(iss, line)) {
+        while (std::getline(iss, line))
+        {
             DiskUsage disk = DiskUsage(line);
             results.push_back(filter->iterateDiskUsage(&disk));
         }

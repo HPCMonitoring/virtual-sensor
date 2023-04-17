@@ -59,10 +59,12 @@ void KakfaClient::Worker::_sendMessage()
 
     while (!this->stopFlag.load(std::memory_order_acquire))
     {
-        try {
+        try
+        {
             std::vector<std::string> records = r.getData(this->prop->filter);
             const size_t numOfRecords = records.size();
-            for (size_t i = 0; i < numOfRecords; ++i) {
+            for (size_t i = 0; i < numOfRecords; ++i)
+            {
                 this->handler->produce(this->topic,
                                        RdKafka::Topic::PARTITION_UA,
                                        RdKafka::Producer::RK_MSG_COPY,
@@ -72,7 +74,9 @@ void KakfaClient::Worker::_sendMessage()
                                        0,     // Key length
                                        NULL); // Opaque value
             }
-        } catch (std::exception &exception) {
+        }
+        catch (std::exception &exception)
+        {
             // TODO: SPD log error here
             std::cout << exception.what();
         }
@@ -83,7 +87,8 @@ void KakfaClient::Worker::_sendMessage()
     delete this;
 }
 
-void KakfaClient::Worker::stop() {
+void KakfaClient::Worker::stop()
+{
     this->stopFlag = true;
 }
 
@@ -95,11 +100,12 @@ KakfaClient::Worker::~Worker()
     delete this->prop;
 }
 
-KakfaClient::WorkerProp::WorkerProp(const std::string &topicName, Filter *filter, const time_t interval) :
-        topicName(topicName), filter(filter), interval(interval) {
+KakfaClient::WorkerProp::WorkerProp(const std::string &topicName, Filter *filter, const time_t interval) : topicName(topicName), filter(filter), interval(interval)
+{
     // do nothing
 }
 
-KakfaClient::WorkerProp::~WorkerProp() {
+KakfaClient::WorkerProp::~WorkerProp()
+{
     delete this->filter;
 }

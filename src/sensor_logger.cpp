@@ -1,6 +1,5 @@
 #include "sensor_logger.h"
 
-
 SensorLogger *SensorLogger::_singleton = nullptr;
 std::mutex SensorLogger::_singletonMutex;
 const std::string SensorLogger::ROOT_LOGGER_NAME = "ROOT_LOGGER";
