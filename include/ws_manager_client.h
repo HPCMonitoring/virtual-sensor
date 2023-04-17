@@ -1,14 +1,10 @@
 #ifndef __SENSOR_MANAGER_WEBSOCKET_CLIENT_H__
 #define __SENSOR_MANAGER_WEBSOCKET_CLIENT_H__
 
-#include <ixwebsocket/IXNetSystem.h>
-#include <ixwebsocket/IXWebSocket.h>
-#include <ixwebsocket/IXUserAgent.h>
-#include <nlohmann/json.hpp>
-#include <sensor_logger.h>
-#include <utils.h>
-#include <client_connector.h>
-#include <handlers/cmd_handler.h>
+#include "sensor_logger.h"
+#include "utils.h"
+#include "client_connector.h"
+#include "handlers/cmd_handler.h"
 
 using json = nlohmann::json;
 

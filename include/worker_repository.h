@@ -1,8 +1,6 @@
 #ifndef __VIRTUAL_SENSOR_WORKER_REPOSITORY_H__
 #define __VIRTUAL_SENSOR_WORKER_REPOSITORY_H__
 
-#include <list>
-#include <mutex>
 #include "clients/kafka_client.h"
 
 class WorkerRepository {

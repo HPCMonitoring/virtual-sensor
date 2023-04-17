@@ -2,7 +2,6 @@
 #define __VIRTUAL_SENSOR_PLAINJSONSTR_H__
 
 #include "schemas/json_serializable.h"
-#include <string>
 
 class PlainJsonStr : public JsonSerializable {
 private:

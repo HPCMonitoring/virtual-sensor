@@ -1,5 +1,3 @@
-#include <sstream>
-#include <boost/format.hpp>
 #include "schemas/sys_info.h"
 
 std::string SysInfo::toJson() const {

@@ -1,5 +1,4 @@
 #include "repository/filter.h"
-#include <iomanip>
 
 template <typename T>
 inline bool compare(const T &a, const T &b, const std::string &op)
