@@ -91,7 +91,7 @@ std::vector<std::string> Repository::getData(const Filter *filter)
         FILE *pipe = popen("iostat -d -k 1 1", "r");
         if (!pipe)
         {
-            std::cerr << "Error: Failed to run iostat command." << std::endl;
+            std::cerr << "Error: Failed to run iostat command.\n";
             return results;
         }
         char buffer[256];
@@ -123,7 +123,7 @@ std::vector<std::string> Repository::getData(const Filter *filter)
         FILE *pipe = popen("df -h", "r");
         if (!pipe)
         {
-            std::cerr << "Error: Failed to run df command." << std::endl;
+            std::cerr << "Error: Failed to run df command.\n";
             return results;
         }
         char buffer[256];

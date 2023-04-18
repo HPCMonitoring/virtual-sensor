@@ -6,33 +6,24 @@
 #define CLOCK_PER_MILISECS 1000.0
 #define BUFFER_SIZE 5000
 
+#define N_NAME "name"
 #define N_PID "pid"
 #define N_PPID "parentPid"
 #define N_UID "uid"
 #define N_GID "gid"
 #define N_EXEC_PATH "executePath"
 #define N_CMD "command"
-#define N_VMU "virtualMemoryUsage"
-#define N_PMU "physicalMemoryUsage"
+#define N_VMU "virtualMemory"
+#define N_PMU "physicalMemory"
 #define N_CPUT "cpuTime"
 #define N_CPUU "cpuUsage"
 #define N_NETIN "networkInBandwidth"
 #define N_NETOUT "networkOutBandwidth"
-#define N_IOR "ioRead"
-#define N_IOW "ioWrite"
-#define N_NAME "name"
-
-enum ProcessStatusInfoLine
-{
-    UID = 8,
-    GID = 9,
-    VM_SIZE = 17,
-    RSS = 21
-};
+#define N_IOR "readKBs"
+#define N_IOW "writeKBs"
 
 inline bool fileExists(const std::string &);
 
-// TODO: Reuse file pointer
 class Process
 {
 private:
@@ -51,10 +42,7 @@ private:
     std::string networkOutBandwidth;
     std::string readKBs;  // In KB
     std::string writeKBs; // In KB
-    std::string readPerSec;
-    std::string writePerSec;
     bool _exists;
-    unsigned long long startTime;
 
 private:
     std::string entryDirname;
@@ -77,11 +65,6 @@ public:
     std::string getNetworkOutBandwidth();
     std::string getWriteKBs();
     std::string getReadKBs();
-    std::string getIOReadPerSec();
-    std::string getIOWritePerSec();
-
-private:
-    inline unsigned long long _getStartTime();
 
 private:
     inline void _readStatFile();

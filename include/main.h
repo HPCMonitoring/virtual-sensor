@@ -27,4 +27,6 @@
 #include <ixwebsocket/IXUserAgent.h>
 #include <nlohmann/json.hpp>
 
+#define NULLIFY(str) str = (str.length() == 0 ? "null" : str)
+
 #endif

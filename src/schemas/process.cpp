@@ -12,16 +12,20 @@ Process::Process(pid_t pid)
     if (pid < 0)
         throw InvalidPID();
 
-    this->entryDirname = "/proc/" + std::to_string(pid);
+    this->pid = std::to_string(pid);
+    this->entryDirname = "/proc/" + this->pid;
     if (!fileExists(this->entryDirname + "/status"))
     {
         this->_exists = false;
         return;
     }
 
-    this->pid = std::to_string(pid);
-    this->startTime = 0;
     this->_exists = true;
+}
+
+bool Process::exists() const
+{
+    return this->_exists;
 }
 
 std::string Process::getName()
@@ -69,6 +73,7 @@ std::string Process::getExecutePath()
         {
             execPath[len] = '\0';
             this->executePath = std::string(execPath);
+            NULLIFY(this->executePath);
         }
     }
 
@@ -84,6 +89,8 @@ std::string Process::getCommand()
             return "";
 
         std::getline(ifs, this->command);
+        this-> command = std::regex_replace(this->command, std::regex("\""), "\\\"");
+        NULLIFY(this->command);
         ifs.close();
     }
 
@@ -117,11 +124,11 @@ std::string Process::getCpuUsage()
     std::string command = "ps -p " + this->pid + " -o \%cpu";
     FILE *pipe = popen(command.c_str(), "r");
 
-    char buffer[BUFFER_SIZE];
-    std::string result = "";
+    char buffer[20];
+    std::string result;
     short lineNumber = 0;
 
-    while (!feof(pipe) && fgets(buffer, BUFFER_SIZE, pipe) != NULL)
+    while (!feof(pipe) && fgets(buffer, 20, pipe) != nullptr)
     {
         if (lineNumber == 1)
         {
@@ -132,22 +139,24 @@ std::string Process::getCpuUsage()
     }
     pclose(pipe);
 
-    if (result.length() != 2)
-        result.pop_back(); // Remove \n character
-    result.erase(0, 1);    // Remove whitespace character
-    return result;
+    if (result.length() > 2)
+        result.pop_back();   // Remove \n character
+    if (result.length() > 0) // String can be empty if no CPU usage
+        result.erase(0, 1);  // Remove whitespace character
+
+    return result.length() > 0 ? result : "0";
 }
 
 // TODO
 std::string Process::getNetworkInBandwidth()
 {
-    return "-1";
+    return "null";
 }
 
 // TODO
 std::string Process::getNetworkOutBandwidth()
 {
-    return "-1";
+    return "null";
 }
 
 std::string Process::getReadKBs()
@@ -161,44 +170,7 @@ std::string Process::getWriteKBs()
 {
     if (this->writeKBs.length() == 0)
         this->_readIoFile();
-    return this->writePerSec;
-}
-
-std::string Process::getIOReadPerSec()
-{
-    if (this->readPerSec.length() == 0)
-    {
-        std::string readKBs = this->getReadKBs();
-        auto startTime = std::chrono::system_clock::from_time_t(0) + std::chrono::seconds(this->_getStartTime() / sysconf(_SC_CLK_TCK));
-        auto currentTime = std::chrono::system_clock::now();
-        int64_t elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count();
-        double readPerSec = std::stod(readKBs) / elapsedTime;
-        this->readPerSec = std::to_string(readPerSec);
-    }
-
-    return this->readPerSec;
-}
-
-std::string Process::getIOWritePerSec()
-{
-    if (this->writePerSec.length() == 0)
-    {
-        std::string writeKBs = this->getWriteKBs();
-        auto startTime = std::chrono::system_clock::from_time_t(0) + std::chrono::seconds(this->_getStartTime() / sysconf(_SC_CLK_TCK));
-        auto currentTime = std::chrono::system_clock::now();
-        int64_t elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count();
-        double writePerSec = std::stod(writeKBs) / elapsedTime;
-        this->writePerSec = std::to_string(writePerSec);
-    }
-
-    return this->writePerSec;
-}
-
-inline unsigned long long Process::_getStartTime()
-{
-    if (this->startTime == 0)
-        this->_readStatFile();
-    return this->startTime;
+    return this->writeKBs;
 }
 
 inline void Process::_readStatFile()
@@ -214,20 +186,21 @@ inline void Process::_readStatFile()
 
     while (iss >> token)
     {
-        count++;
         if (count == 3) // ppid
             this->parentPid = token;
         else if (count == 14) // utime
             utime = std::stoul(token);
         else if (count == 15) // stime
-            stime = std::stoul(token);
-        else if (count == 22) // start_time
         {
-            this->startTime = std::stoull(token);
+            stime = std::stoul(token);
             break; // No need to continue parsing
         }
+        count++;
     }
-    this->cpuTime = std::to_string((double)(utime + stime) / CLOCK_PER_MILISECS);
+    std::ostringstream oss;
+    oss.precision(3);
+    oss << std::fixed << (double)(utime + stime) / CLOCK_PER_MILISECS;
+    this->cpuTime = oss.str();
 
     statFile.close();
 }
@@ -236,6 +209,7 @@ inline void Process::_readCommFile()
 {
     std::ifstream ifs(this->entryDirname + "/comm");
     std::getline(ifs, this->name);
+    NULLIFY(this->name);
     ifs.close();
 }
 
@@ -256,6 +230,8 @@ inline void Process::_readStatusFile()
             ss >> token;
             ss >> token;
 
+            NULLIFY(token);
+
             idx == 8 ? this->uid = token : this->gid = token;
         }
         else if (idx > 9)
@@ -270,6 +246,7 @@ inline void Process::_readStatmFile()
 {
     std::ifstream statmFile(this->entryDirname + "/statm");
     std::getline(statmFile, this->virtualMemory, ' ');
+    NULLIFY(this->virtualMemory);
     statmFile.close();
 }
 
@@ -285,6 +262,8 @@ inline void Process::_readSmapsRollupFile()
 
     iss >> this->physicalMemory; // Ignore "Rss:"
     iss >> this->physicalMemory;
+
+    NULLIFY(this->physicalMemory);
 
     statmFile.close();
 }
@@ -302,18 +281,22 @@ inline void Process::_readIoFile()
         iss >> field;
 
         if (field == "read_bytes:")
-        {
             iss >> readBytes;
-        }
         else if (field == "write_bytes:")
         {
             iss >> writeBytes;
             break; // No need to continue
         }
     }
+    std::ostringstream ossRead;
+    ossRead.precision(0);
+    ossRead << std::fixed << std::round(readBytes / 1024);
+    this->readKBs = ossRead.str();
 
-    this->readKBs = std::to_string(std::round(readBytes / 1024));
-    this->writeKBs = std::to_string(std::round(writeBytes / 1024));
+    std::ostringstream ossWrite;
+    ossWrite.precision(0);
+    ossWrite << std::fixed << std::round(writeBytes / 1024);
+    this->writeKBs = ossWrite.str();
 
     ioFile.close();
 }

@@ -358,21 +358,25 @@ std::string Filter::iterateNetworkInterface(const NetworkInterface *networkInter
     return oss.str();
 }
 
-inline void Filter::print()
+void Filter::print()
 {
-    std::cout << "Data type: " << this->datatype << std::endl;
+    std::cout << "Data type: " << this->datatype << '\n';
     std::cout << "Fields: "
-              << "<";
-    std::cout << this->projection.at(0).name << "as" << this->projection.at(0).alias;
+              << "<\n";
+    std::cout << '\t' << this->projection.at(0).name;
+    if (this->projection.at(0).alias.length() > 0)
+        std::cout << " -> " << this->projection.at(0).alias;
     for (size_t i = 1; i < this->projection.size(); ++i)
     {
-        std::cout << ", " << this->projection.at(i).name << "as" << this->projection.at(i).alias;
+        std::cout << ",\n\t" << this->projection.at(i).name;
+        if (this->projection.at(i).alias.length() > 0)
+            std::cout << " -> " << this->projection.at(i).alias;
     }
-    std::cout << '>' << std::endl;
+    std::cout << "\n>\n";
 
     std::cout << "Conditions: ";
     this->selection->print();
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 
 std::string Filter::iterateMemory(const Memory *memory) const

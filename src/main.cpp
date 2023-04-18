@@ -35,20 +35,33 @@ int main(int argc, char *argv[])
     // mainThread = std::thread(mainThreadHandler);
     // mainThread.join();
     std::vector<Attribute> attrs;
-    attrs.push_back(Attribute("filesystem", "fs"));
-    attrs.push_back(Attribute("size"));
-    attrs.push_back(Attribute("used"));
-    attrs.push_back(Attribute("available"));
-    attrs.push_back(Attribute("usedPercentage"));
-    attrs.push_back(Attribute("mountedOn"));
+    attrs.push_back(Attribute("name"));
+    attrs.push_back(Attribute("pid", "processID"));
+    attrs.push_back(Attribute("parentPid"));
+    attrs.push_back(Attribute("uid"));
+    attrs.push_back(Attribute("gid"));
+    attrs.push_back(Attribute("executePath"));
+    attrs.push_back(Attribute("command"));
+    attrs.push_back(Attribute("virtualMemory"));
+    attrs.push_back(Attribute("physicalMemory"));
+    attrs.push_back(Attribute("cpuTime"));
+    attrs.push_back(Attribute("cpuUsage"));
+    attrs.push_back(Attribute("networkInBandwidth"));
+    attrs.push_back(Attribute("networkOutBandwidth"));
+    attrs.push_back(Attribute("readKBs"));
+    attrs.push_back(Attribute("writeKBs"));
 
-    Filter filter(DISK, attrs);
+    Filter filter(PROCESS, attrs, "%= executePath .*slack.*");
     Repository &r = Repository::getInstance();
+
     auto data = r.getData(&filter);
+    std::cout << '[';
     for (size_t i = 0; i < data.size(); ++i)
     {
-        std::cout << data.at(i) << std::endl;
+        std::cout << data.at(i) << '\n';
+        if(i != data.size() - 1) std::cout << ',';
     }
+    std::cout << ']';
 
     return 0;
 }
