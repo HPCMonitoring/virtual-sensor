@@ -57,9 +57,9 @@ bool RelationalExpr::validate(Process *proc) const
     {
         std::string compareValueStr;
         if (this->operand == N_VMU)
-            compareValueStr = proc->getVirtualMemoryUsage();
+            compareValueStr = proc->getVirtualMemory();
         else if (this->operand == N_PMU)
-            compareValueStr = proc->getPhysicalMemoryUsage();
+            compareValueStr = proc->getPhysicalMemory();
         else if (this->operand == N_CPUT)
             compareValueStr = proc->getCpuTime();
         else if (this->operand == N_CPUU)
@@ -69,9 +69,9 @@ bool RelationalExpr::validate(Process *proc) const
         else if (this->operand == N_NETOUT)
             compareValueStr = proc->getNetworkOutBandwidth();
         else if (this->operand == N_IOR)
-            compareValueStr = proc->getIoRead();
+            compareValueStr = proc->getReadKBs();
         else if (this->operand == N_IOW)
-            compareValueStr = proc->getIoWrite();
+            compareValueStr = proc->getWriteKBs();
 
         const double compareValue = compareValueStr.length() > 0 ? std::stod(compareValueStr) : -1.0;
         const double literalValue = std::stod(this->literal);
@@ -247,9 +247,9 @@ std::string Filter::iterateProc(Process *proc) const
             jsonAttrStr.push_back('\"');
         }
         else if (this->projection.at(i).name == N_VMU)
-            jsonAttrStr.append(proc->getVirtualMemoryUsage());
+            jsonAttrStr.append(proc->getVirtualMemory());
         else if (this->projection.at(i).name == N_PMU)
-            jsonAttrStr.append(proc->getPhysicalMemoryUsage());
+            jsonAttrStr.append(proc->getPhysicalMemory());
         else if (this->projection.at(i).name == N_CPUT)
             jsonAttrStr.append(proc->getCpuTime());
         else if (this->projection.at(i).name == N_CPUU)
@@ -259,9 +259,9 @@ std::string Filter::iterateProc(Process *proc) const
         else if (this->projection.at(i).name == N_NETOUT)
             jsonAttrStr.append(proc->getNetworkOutBandwidth());
         else if (this->projection.at(i).name == N_IOR)
-            jsonAttrStr.append(proc->getIoRead());
+            jsonAttrStr.append(proc->getReadKBs());
         else if (this->projection.at(i).name == N_IOW)
-            jsonAttrStr.append(proc->getIoWrite());
+            jsonAttrStr.append(proc->getWriteKBs());
 
         if (i != numOfAttrs - 1)
             jsonAttrStr.push_back(',');

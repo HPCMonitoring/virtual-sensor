@@ -21,12 +21,9 @@
 #define N_IOR "ioRead"
 #define N_IOW "ioWrite"
 #define N_NAME "name"
- 
+
 enum ProcessStatusInfoLine
 {
-    NAME = 0,
-    PID = 5,
-    PARENT_PID = 6,
     UID = 8,
     GID = 9,
     VM_SIZE = 17,
@@ -46,18 +43,21 @@ private:
     std::string gid;
     std::string executePath;
     std::string command;
-    std::string virtualMemoryUsage;
-    std::string physicalMemoryUsage;
+    std::string virtualMemory;
+    std::string physicalMemory;
     std::string cpuTime;
     std::string cpuUsage;
     std::string networkInBandwidth; // What interface ???
     std::string networkOutBandwidth;
-    std::string ioWrite; // In KB
-    std::string ioRead;  // In KB
+    std::string readKBs;  // In KB
+    std::string writeKBs; // In KB
+    std::string readPerSec;
+    std::string writePerSec;
     bool _exists;
+    unsigned long long startTime;
+
 private:
-    std::string statusFilename;
-    std::string processEntryDirname;
+    std::string entryDirname;
 
 public:
     Process(pid_t);
@@ -69,59 +69,27 @@ public:
     std::string getGid();
     std::string getExecutePath();
     std::string getCommand();
-
-    std::string getVirtualMemoryUsage();  // In KB
-    std::string getPhysicalMemoryUsage(); // In KB
-    std::string getCpuTime();            // In ms
-    std::string getCpuUsage();            // In %
+    std::string getVirtualMemory();  // In KB
+    std::string getPhysicalMemory(); // In KB
+    std::string getCpuTime();        // In ms
+    std::string getCpuUsage();       // In %
     std::string getNetworkInBandwidth();
     std::string getNetworkOutBandwidth();
-    std::string getIoWrite();
-    std::string getIoRead();
+    std::string getWriteKBs();
+    std::string getReadKBs();
+    std::string getIOReadPerSec();
+    std::string getIOWritePerSec();
 
 private:
-    std::string _readProcessInfoFile(const ProcessStatusInfoLine lineNumber)
-    {
-        std::ifstream processInfoFile(this->statusFilename);
-        std::string line;
-        std::string value;
-        short idx = 0;
+    inline unsigned long long _getStartTime();
 
-        while (std::getline(processInfoFile, line))
-        {
-            if (idx == lineNumber)
-            {
-                value = this->_getFirstValueInLine(line);
-                break;
-            }
-            idx++;
-        }
-
-        processInfoFile.close();
-        return value;
-    }
-
-    /**
-     * @brief Remove the label appears in the head of line, then get the first value next.\\
-     * @brief Ex: "Name: 15 <...values>" -> "15"
-     * @param line
-     * @return uint
-     */
-    inline std::string _getFirstValueInLine(std::string &line) const
-    {
-        std::stringstream ss(line);
-        std::string token = "";
-        int wordIndex = 0;
-
-        while (ss >> token)
-        {
-            if (wordIndex == 1)
-                return token;
-            wordIndex++;
-        }
-
-        return line;
-    }
+private:
+    inline void _readStatFile();
+    inline void _readCommFile();
+    inline void _readStatusFile();
+    inline void _readStatmFile();
+    inline void _readSmapsRollupFile();
+    inline void _readIoFile();
 };
 
 #endif
