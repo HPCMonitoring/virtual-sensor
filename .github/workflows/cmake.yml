@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt install librdkafka-dev libspdlog-dev sysstat libpcap-dev
-          git clone git@github.com:machinezone/IXWebSocket.git
+          git clone https://github.com/machinezone/IXWebSocket.git
           cd IXWebSocket
           cmake -DBUILD_SHARED_LIBS=ON
           make -j
