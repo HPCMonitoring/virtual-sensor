@@ -17,12 +17,12 @@ jobs:
     steps:
       - name: Install dependencies
         run: |
-          apt install librdkafka-dev libspdlog-dev sysstat libpcap-dev
+          sudo apt install librdkafka-dev libspdlog-dev sysstat libpcap-dev
           git clone git@github.com:machinezone/IXWebSocket.git
           cd IXWebSocket
           cmake -DBUILD_SHARED_LIBS=ON
           make -j
-          make install
+          sudo make install
       - uses: actions/checkout@v3
       - name: Configure CMake
         # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
