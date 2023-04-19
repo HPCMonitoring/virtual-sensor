@@ -10,12 +10,13 @@ Dependencies:
 - [`spdlog`](https://github.com/gabime/spdlog)
 - `sysstat`
 - `libpcap-dev`
+- `boost`
 - [`ixwebsocket`](https://machinezone.github.io/IXWebSocket/build/)
 
 Install:
 
 ```bash
-sudo apt install librdkafka-dev libspdlog-dev sysstat libpcap-dev
+sudo apt install librdkafka-dev libspdlog-dev sysstat libpcap-dev libboost-all-dev
 git clone git@github.com:machinezone/IXWebSocket.git
 cd IXWebSocket
 cmake -DBUILD_SHARED_LIBS=ON
