@@ -11,12 +11,13 @@ Dependencies:
 - `sysstat`
 - `libpcap-dev`
 - `boost`
+- `nlohmann-json-dev`
 - [`ixwebsocket`](https://machinezone.github.io/IXWebSocket/build/)
 
 Install:
 
 ```bash
-sudo apt install librdkafka-dev libspdlog-dev sysstat libpcap-dev libboost-all-dev
+sudo apt install librdkafka-dev libspdlog-dev sysstat libpcap-dev libboost-all-dev nlohmann-json-dev
 git clone git@github.com:machinezone/IXWebSocket.git
 cd IXWebSocket
 cmake -DBUILD_SHARED_LIBS=ON
