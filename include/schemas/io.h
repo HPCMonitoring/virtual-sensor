@@ -10,9 +10,9 @@ public:
     std::string readPerSec;
     std::string read;
     std::string writePerSec;
-    std::string writen;
+    std::string write;
     std::string discardPerSec;
-    std::string discarded;
+    std::string discard;
 public:
     IOStat(const std::string&);
 };

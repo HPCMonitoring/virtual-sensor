@@ -9,8 +9,8 @@ IOStat::IOStat(const std::string &dataline)
     iss >> this->writePerSec;
     iss >> this->discardPerSec;
     iss >> this->read;
-    iss >> this->writen;
-    iss >> this->discarded;
+    iss >> this->write;
+    iss >> this->discard;
 
     std::replace(this->readPerSec.begin(), this->readPerSec.end(), ',', '.');
     std::replace(this->writePerSec.begin(), this->writePerSec.end(), ',', '.');

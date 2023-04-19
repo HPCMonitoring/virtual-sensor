@@ -475,12 +475,12 @@ std::string Filter::iterateIO(const IOStat *io) const
             oss << io->read;
         else if (this->projection.at(i).name == "writePerSec")
             oss << io->tps;
-        else if (this->projection.at(i).name == "writen")
-            oss << io->writen;
+        else if (this->projection.at(i).name == "write")
+            oss << io->write;
         else if (this->projection.at(i).name == "discardPerSec")
             oss << io->discardPerSec;
-        else if (this->projection.at(i).name == "discarded")
-            oss << io->discarded;
+        else if (this->projection.at(i).name == "discard")
+            oss << io->discard;
 
         if (i != numOfAttrs - 1)
             oss << ',';
