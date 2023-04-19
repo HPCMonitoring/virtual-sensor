@@ -8,13 +8,16 @@ KakfaClient::KakfaClient(const std::string &clientId, const std::string &brokerU
     RdKafka::Conf *conf = RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL);
     conf->set("client.id", clientId, errstr);
     conf->set("bootstrap.servers", brokerUrl, errstr);
+    conf->set("linger.ms", "500", errstr);
+    conf->set("compression.type", "snappy", errstr);
+    conf->set("acks", "0", errstr);
 
     RdKafka::Producer *kafkaProducer = RdKafka::Producer::create(conf, errstr);
 
     if (!kafkaProducer)
         throw std::runtime_error(ERR_CREATE_PRODUCER + errstr);
 
-    this->producer = kafkaProducer;
+    this->producer = std::shared_ptr<RdKafka::Producer>(kafkaProducer);
     delete conf;
 }
 
@@ -26,7 +29,6 @@ KakfaClient::~KakfaClient()
         i->second->stop();
     }
     this->producer->flush(5000);
-    delete this->producer;
 }
 
 KakfaClient::Worker *KakfaClient::addWorker(KakfaClient::WorkerProp *prop)
@@ -36,11 +38,11 @@ KakfaClient::Worker *KakfaClient::addWorker(KakfaClient::WorkerProp *prop)
     return worker;
 }
 
-KakfaClient::Worker::Worker(RdKafka::Producer *handler, WorkerProp *prop)
+KakfaClient::Worker::Worker(std::shared_ptr<RdKafka::Producer> handler, WorkerProp *prop)
 {
     std::string errMsg;
     this->prop = prop;
-    RdKafka::Topic *topic = RdKafka::Topic::create(handler, this->prop->topicName, NULL, errMsg);
+    RdKafka::Topic *topic = RdKafka::Topic::create(handler.get(), this->prop->topicName, NULL, errMsg);
     this->topic = topic;
     this->handler = handler;
     this->stopFlag = false;

@@ -5,7 +5,6 @@
 #include <string>
 #include <fstream>
 #include <sstream>
-#include <sys/stat.h>
 #include <climits>
 #include <thread>
 #include <atomic>
@@ -17,6 +16,8 @@
 #include <mutex>
 #include <iomanip>
 #include <unordered_set>
+#include <sys/utsname.h>
+#include <sys/stat.h>
 // #include <pcap.h>
 #include <boost/format.hpp>
 #include <librdkafka/rdkafkacpp.h>

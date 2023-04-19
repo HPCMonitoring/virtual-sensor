@@ -1,12 +1,14 @@
-#include <handlers/sys_info_handler.h>
+#include "handlers/sys_info_handler.h"
 
-void SysInfoHandler::handle(ClientConnector *responder, const WsMessage &message)
-{
+void SysInfoHandler::handle(ClientConnector *responder, const WsMessage& message) {
+    struct utsname systemName;
+    uname(&systemName);
+
     auto *sysInfo = new SysInfo();
-    sysInfo->kernelName = "Linux";
-    sysInfo->kernelVersion = "5.19.0-32-generic";
-    sysInfo->arch = "x86_64";
-    sysInfo->hostname = "PhucVinh";
+    sysInfo->kernelName = systemName.sysname;
+    sysInfo->kernelVersion = systemName.release;
+    sysInfo->arch = systemName.machine;
+    sysInfo->hostname = systemName.domainname;
     sysInfo->rootUser = "root";
 
     WsMessage res = WsMessage::from(message);
