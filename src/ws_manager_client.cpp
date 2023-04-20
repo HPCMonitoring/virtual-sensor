@@ -1,5 +1,5 @@
 #include <fstream>
-#include <boost/format.hpp>
+#include <sstream>
 #include <ws_manager_client.h>
 #include "handlers/plain_json_str.h"
 
@@ -54,9 +54,9 @@ void SensorManagerClient::registerHandler(WsCommand cmd, CmdHandler *handler)
 
 void SensorManagerClient::on_message(const ix::WebSocketMessagePtr &msg)
 {
-    SPDLOG_LOGGER_INFO(
-        this->_logger,
-        boost::str(boost::format("on_message called with message: %s") % msg->str));
+    std::stringstream ss;
+    ss << "on_message called with message: " << msg->str;
+    SPDLOG_LOGGER_INFO(this->_logger, ss.str());
 
     json msgJson = json::parse(msg->str);
     try
@@ -74,39 +74,40 @@ void SensorManagerClient::on_message(const ix::WebSocketMessagePtr &msg)
         }
         else
         {
-            SPDLOG_LOGGER_ERROR(
-                this->_logger,
-                boost::str(boost::format("no handler for command: %s") % cmd));
+            std::stringstream ss;
+            ss << "no handler for command: " << cmd;
+            SPDLOG_LOGGER_ERROR(this->_logger, ss.str());
         }
 
     }
     catch (const std::exception &e)
     {
-        SPDLOG_LOGGER_ERROR(
-            this->_logger,
-            boost::str(boost::format("on_open called with message: %s") % e.what()));
+        std::stringstream ss;
+        ss << "on_message handling error with message: " << e.what();
+        SPDLOG_LOGGER_ERROR(this->_logger, ss.str());
     }
 }
 
 void SensorManagerClient::on_open(const ix::WebSocketMessagePtr &msg)
 {
-    SPDLOG_LOGGER_INFO(
-        this->_logger,
-        boost::str(boost::format("on_open called with message: %s") % msg->str));
+    std::stringstream ss;
+    ss << "on_open called with message: " << msg->str;
+    SPDLOG_LOGGER_INFO(this->_logger, ss.str());
 }
 
 void SensorManagerClient::on_error(const ix::WebSocketMessagePtr &msg)
 {
-    SPDLOG_LOGGER_ERROR(
-        this->_logger,
-        boost::str(boost::format("on_error called with message: %s") % msg->errorInfo.reason));
+    std::stringstream ss;
+    ss << "on_error called with message: " << msg->errorInfo.reason;
+    SPDLOG_LOGGER_ERROR(this->_logger, ss.str());
 }
 
 void SensorManagerClient::on_close(const ix::WebSocketMessagePtr &msg)
 {
-    SPDLOG_LOGGER_ERROR(
-        this->_logger,
-        boost::str(boost::format("on_close called with code: %s,  message: %s") % msg->closeInfo.code % msg->closeInfo.reason));
+    std::stringstream ss;
+    ss << "on_close called with code: " << msg->closeInfo.code
+        << ", message: " << msg->closeInfo.reason;
+    SPDLOG_LOGGER_ERROR(this->_logger, ss.str());
 }
 
 void SensorManagerClient::setupAndStart()
@@ -114,9 +115,9 @@ void SensorManagerClient::setupAndStart()
     while(!this->_stopFlag) {
         std::thread thread_obj(&SensorManagerClient::run, this);
         thread_obj.join();
-        SPDLOG_LOGGER_INFO(
-            this->_logger,
-            boost::str(boost::format("websocket client run done and start re-run in next %d sec") % this->_nextConnRetry));
+        std::stringstream ss;
+        ss << "websocket client run done and start re-run in next " << this->_nextConnRetry << " sec";
+        SPDLOG_LOGGER_INFO(this->_logger, ss.str());
         std::this_thread::sleep_for (std::chrono::seconds(this->_nextConnRetry));
     }
 

@@ -1,5 +1,5 @@
-#include <boost/format.hpp>
 #include "handlers/ws_message.h"
+#include <sstream>
 
 WsMessage::WsMessage() {
     // do nothing
@@ -21,21 +21,16 @@ WsMessage WsMessage::from(const WsMessage &other) {
 }
 
 std::string WsMessage::toJson() const {
-    auto format = boost::format("{"
-                                "\"cmd\": %d,"
-                                "\"message\": \"%s\", "
-                                "\"error\": %d, "
-                                "\"coordId\": \"%s\","
-                                "\"payload\": %s"
-                                "}");
-    return boost::str(
-            format %
-            this->cmd %
-            this->msg %
-            this->error %
-            this->coordId %
-            (this->payload ? this->payload->toJson() : "{}")
-    );
+    std::stringstream ss;
+
+    ss    << "{"
+          << "\"cmd\":"     <<          this->cmd       << ","
+          << "\"message\":" << "\"" <<  this->msg       << "\"" << ","
+          << "\"error\":"   <<          this->error     << ","
+          << "\"coordId\":" <<          this->coordId   << ","
+          << "\"payload\":" << "\"" <<  (this->payload ? this->payload->toJson() : "{}") << "\""
+          << "}";
+    return ss.str();
 }
 
 WsMessage::~WsMessage() {
