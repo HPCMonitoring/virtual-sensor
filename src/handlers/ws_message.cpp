@@ -27,8 +27,8 @@ std::string WsMessage::toJson() const {
           << "\"cmd\":"     <<          this->cmd       << ","
           << "\"message\":" << "\"" <<  this->msg       << "\"" << ","
           << "\"error\":"   <<          this->error     << ","
-          << "\"coordId\":" <<          this->coordId   << ","
-          << "\"payload\":" << "\"" <<  (this->payload ? this->payload->toJson() : "{}") << "\""
+          << "\"coordId\":" << "\"" <<   this->coordId  << "\"" << ","
+          << "\"payload\":" << (this->payload ? this->payload->toJson() : "{}")
           << "}";
     return ss.str();
 }

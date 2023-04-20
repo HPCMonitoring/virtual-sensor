@@ -3,31 +3,36 @@
 WorkerRepository *WorkerRepository::_singleton = nullptr;
 std::mutex WorkerRepository::_singletonMutex;
 
-WorkerRepository::WorkerRepository() {
+WorkerRepository::WorkerRepository()
+{
     // do nothing
 }
 
-void WorkerRepository::clearAll() {
-    for (auto & it : this->producers) {
+void WorkerRepository::clearAll()
+{
+    for (auto &it : this->producers)
+    {
         delete it.second;
     }
     this->producers.clear();
 }
 
-void WorkerRepository::addWorker(std::string brokerUrl, Recorder::WorkerProp *prop) {
+void WorkerRepository::addWorker(std::string brokerUrl, KakfaClient::WorkerProp *prop)
+{
     auto iter = this->producers.find(brokerUrl);
-    if (iter == this->producers.end()) {
+    if (iter == this->producers.end())
+    {
         // TODO: replace hard code clientId here
-        auto producer = new Recorder("sensor-manager-api", brokerUrl);
+        auto producer = new KakfaClient("sensor-manager-api", brokerUrl);
         this->producers.insert({brokerUrl, producer});
     }
 
     auto producer = this->producers.at(brokerUrl);
     producer->addWorker(prop);
-
 }
 
-WorkerRepository* WorkerRepository::getInstance() {
+WorkerRepository *WorkerRepository::getInstance()
+{
     std::lock_guard<std::mutex> lock(_singletonMutex);
     if (_singleton == nullptr)
     {
@@ -35,5 +40,3 @@ WorkerRepository* WorkerRepository::getInstance() {
     }
     return _singleton;
 }
-
-

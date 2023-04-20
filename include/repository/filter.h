@@ -2,7 +2,12 @@
 #define __FILTER_H__
 
 #include "main.h"
-#include "process.h"
+#include "schemas/process.h"
+#include "schemas/network_interface.h"
+#include "schemas/memory.h"
+#include "schemas/cpu.h"
+#include "schemas/io.h"
+#include "schemas/disk_usage.h"
 
 #define AND_OP "&&"
 #define OR_OP "||"
@@ -89,7 +94,12 @@ private:
 public:
     Filter(const std::string &datatype, const std::vector<Attribute> &projection);
     Filter(const std::string &datatype, const std::vector<Attribute> &projection, const std::string &selection);
-    std::string iterate(Process *) const;
+    std::string iterateProc(Process *) const;
+    std::string iterateNetworkInterface(const NetworkInterface*) const;
+    std::string iterateMemory(const Memory*) const;
+    std::string iterateCpu(const Cpu*) const;
+    std::string iterateIO(const IOStat*) const;
+    std::string iterateDiskUsage(const DiskUsage *) const;
     void print();
     ~Filter();
 };

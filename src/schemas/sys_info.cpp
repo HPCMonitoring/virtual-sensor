@@ -1,5 +1,5 @@
 #include <sstream>
-#include "schema/sys_info.h"
+#include "schemas/sys_info.h"
 
 std::string SysInfo::toJson() const {
     std::stringstream  ss;

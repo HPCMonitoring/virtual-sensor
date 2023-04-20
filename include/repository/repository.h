@@ -2,7 +2,7 @@
 #define __PROCESS_REPOSITORY_H__
 
 #include "main.h"
-#include "filter.h"
+#include "repository/filter.h"
 
 #define PROC_FS "/proc"
 
@@ -19,7 +19,7 @@ private:
 
 public:
     static Repository &getInstance();
-    std::string getData(const Filter*);
+    std::vector<std::string> getData(const Filter*);
 
 private:
     std::vector<pid_t> getAllPids()
