@@ -1,9 +1,7 @@
-#ifndef __SENSOR_LOGGER__
-#define __SENSOR_LOGGER__
+#ifndef __SENSOR_LOGGER_H__
+#define __SENSOR_LOGGER_H__
 
-#include <mutex>
-#include <spdlog/spdlog.h>
-#include <unordered_set>
+#include "main.h"
 
 class SensorLogger
 {

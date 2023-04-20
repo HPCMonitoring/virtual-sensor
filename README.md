@@ -4,21 +4,21 @@ An agent run on each node in HPC system, which is responsible for monitoring & h
 
 ## Prerequisite
 
-Install [`librdkafka`](https://github.com/confluentinc/librdkafka):
+Dependencies:
+
+- [`librdkafka`](https://github.com/confluentinc/librdkafka)
+- [`spdlog`](https://github.com/gabime/spdlog)
+- `sysstat`
+- `libpcap-dev`
+- `boost`
+- `nlohmann-json-dev`
+- [`ixwebsocket`](https://machinezone.github.io/IXWebSocket/build/)
+
+Install:
 
 ```bash
-sudo apt install librdkafka-dev
-```
-
-Install [`spdlog`](https://github.com/gabime/spdlog):
-
-```bash
-sudo apt install libspdlog-dev
-```
-
-Install [`ixwebsocket`](https://machinezone.github.io/IXWebSocket/build/)
-
-```bash
+sudo apt install librdkafka-dev libspdlog-dev sysstat libpcap-dev libboost-all-dev nlohmann-json3-dev
+git clone git@github.com:machinezone/IXWebSocket.git
 cd IXWebSocket
 cmake -DBUILD_SHARED_LIBS=ON
 make -j
@@ -30,7 +30,7 @@ make install
 Build to binary:
 
 ```bash
-make compile
+make
 ```
 
 Test memory leak:

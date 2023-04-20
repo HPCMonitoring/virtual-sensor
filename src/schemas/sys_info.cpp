@@ -1,6 +1,4 @@
-#include <sstream>
-#include <boost/format.hpp>
-#include "schema/sys_info.h"
+#include "schemas/sys_info.h"
 
 std::string SysInfo::toJson() const {
     auto format = boost::format("{\n"

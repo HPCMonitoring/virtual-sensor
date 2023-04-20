@@ -1,5 +1,4 @@
-#include <handlers/sys_info_handler.h>
-#include <sys/utsname.h>
+#include "handlers/sys_info_handler.h"
 
 void SysInfoHandler::handle(ClientConnector *responder, const WsMessage& message) {
     struct utsname systemName;

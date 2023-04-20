@@ -1,10 +1,10 @@
-#ifndef __MESSAGE_PRODUCER_H__
-#define __MESSAGE_PRODUCER_H__
+#ifndef __KAFKA_CLIENT_H__
+#define __KAFKA_CLIENT_H__
 
 #include "main.h"
-#include "filter.h"
+#include "repository/filter.h"
 
-class Recorder
+class KakfaClient
 {
 public:
     class Worker;
@@ -14,13 +14,13 @@ private:
     std::shared_ptr<RdKafka::Producer>producer;
     // Hashmap topic name -> worker
     std::unordered_map<std::string, Worker *> workers;
-    Recorder(const Recorder &) = delete;
+    KakfaClient(const KakfaClient &) = delete;
 
 public:
-    Recorder(const std::string &clientId, const std::string &brokerUrl);
+    KakfaClient(const std::string &clientId, const std::string &brokerUrl);
     Worker *addWorker(WorkerProp *prop);
     Worker *getWorker(const std::string &topicName) const;
-    ~Recorder();
+    ~KakfaClient();
 
 public:
     class Worker
@@ -50,8 +50,6 @@ public:
         WorkerProp(const std::string &topicName, Filter* filter, const time_t interval);
         ~WorkerProp();
     };
-
-
 };
 
 #endif
