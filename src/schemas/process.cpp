@@ -89,7 +89,7 @@ std::string Process::getCommand()
             return "";
 
         std::getline(ifs, this->command);
-        this-> command = std::regex_replace(this->command, std::regex("\""), "\\\"");
+        this->command = std::regex_replace(this->command, std::regex("\""), "\\\"");
         NULLIFY(this->command);
         ifs.close();
     }

@@ -33,14 +33,17 @@ SensorManagerClient *SensorManagerClient::getInstance()
 std::string SensorManagerClient::buildConnStr()
 {
     std::string conn = "ws://";
-
-    std::string spaceReplacement = "%20";
     conn.append(this->_config["server"]).append("/ws").append("?");
-    conn.append("&cluster=").append(utils::strReplace(this->_config["cluster"], " ", spaceReplacement));
-    conn.append("&name=").append(utils::strReplace(this->_config["name"], " ", spaceReplacement));
+
+    std::string clusterParam = std::regex_replace(std::string(this->_config["cluster"]), std::regex(" "), URL_SPACE);
+    std::string nameParam = std::regex_replace(std::string(this->_config["name"]), std::regex(" "), URL_SPACE);
+    conn.append("&cluster=").append(clusterParam);
+    conn.append("&name=").append(nameParam);
+
     if (this->_config.contains("id"))
     {
-        conn.append("&id=").append(utils::strReplace(this->_config["id"], " ", spaceReplacement));
+        std::string idParam = std::regex_replace(std::string(this->_config["id"]), std::regex(" "), URL_SPACE);
+        conn.append("&id=").append(idParam);
     }
     return conn;
 }

@@ -1,33 +1,57 @@
-// #include "recorder.h"
-// #include "ws_manager_client.h"
-// #include "handlers/auth_handler.h"
-// #include "handlers/sys_info_handler.h"
-// #include "handlers/config_handler.h"
-
+#include "ws_manager_client.h"
+#include "handlers/auth_handler.h"
+#include "handlers/sys_info_handler.h"
+#include "handlers/config_handler.h"
 #include "repository/repository.h"
 #include "repository/filter.h"
 
-// std::thread mainThread;
-// SensorManagerClient *client;
+std::thread mainThread;
+SensorManagerClient *client;
 
-// void mainThreadHandler()
-// {
-//     client = SensorManagerClient::getInstance();
-//     auto *authHandler = new AuthHandler();
-//     auto *sysInfoHandler = new SysInfoHandler();
-//     auto *configHandler = new ConfigHandler();
+void mainThreadHandler()
+{
+    client = SensorManagerClient::getInstance();
+    auto *authHandler = new AuthHandler();
+    auto *sysInfoHandler = new SysInfoHandler();
+    auto *configHandler = new ConfigHandler();
 
-//     client->registerHandler(WsCommand::AUTH, authHandler);
-//     client->registerHandler(WsCommand::SYS_INFO, sysInfoHandler);
-//     client->registerHandler(WsCommand::CONFIG, configHandler);
+    client->registerHandler(WsCommand::AUTH, authHandler);
+    client->registerHandler(WsCommand::SYS_INFO, sysInfoHandler);
+    client->registerHandler(WsCommand::CONFIG, configHandler);
 
-//     client->setupAndStart();
-// }
+    client->setupAndStart();
+}
 
-// void signalHandler(int signal)
-// {
-//     std::cout << "\nInterrupt signal (" << signal << ") received.\n";
-// }
+void signalHandler(int signal)
+{
+    std::cout << "\nInterrupt signal (" << signal << ") received.\n";
+    delete client;
+}
+
+void readSampleProc();
+void readSampleCpu();
+void readSampleNetwork();
+void readSampleMemory();
+void readSampleIO();
+void readSampleDisk();
+
+int main(int argc, char *argv[])
+{
+    signal(SIGINT, signalHandler);
+    mainThread = std::thread(mainThreadHandler);
+    mainThread.join();
+
+    // readSampleProc();
+    // readSampleCpu();
+    // readSampleMemory();
+    // readSampleNetwork();
+    // readSampleIO();
+    // readSampleDisk();
+
+    return 0;
+}
+
+
 
 void readSampleProc()
 {
@@ -168,7 +192,6 @@ void readSampleIO()
     std::cout << "]\n";
 }
 
-
 void readSampleDisk()
 {
     std::vector<Attribute> attrs;
@@ -192,20 +215,4 @@ void readSampleDisk()
             std::cout << ',';
     }
     std::cout << "]\n";
-}
-
-int main(int argc, char *argv[])
-{
-    // signal(SIGINT, signalHandler);
-    // mainThread = std::thread(mainThreadHandler);
-    // mainThread.join();
-
-    // readSampleProc();
-    // readSampleCpu();
-    // readSampleMemory();
-    // readSampleNetwork();
-    // readSampleIO();
-    readSampleDisk();
-
-    return 0;
 }
