@@ -28,7 +28,6 @@ KakfaClient::~KakfaClient()
     {
         i->second->stop();
     }
-    this->producer->flush(5000);
 }
 
 KakfaClient::Worker *KakfaClient::addWorker(KakfaClient::WorkerProp *prop)
