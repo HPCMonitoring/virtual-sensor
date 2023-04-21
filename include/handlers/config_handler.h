@@ -9,6 +9,9 @@
 class ConfigHandler : public CmdHandler {
 private:
     std::list<KakfaClient::Worker> workers;
+    std::shared_ptr<spdlog::logger> _logger;
+public:
+    ConfigHandler();
     void handle(ClientConnector *responder, const WsMessage& msg) override;
 };
 #endif

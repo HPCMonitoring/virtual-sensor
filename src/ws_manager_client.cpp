@@ -1,5 +1,4 @@
 #include <fstream>
-#include <boost/format.hpp>
 #include <ws_manager_client.h>
 #include "handlers/plain_json_str.h"
 
