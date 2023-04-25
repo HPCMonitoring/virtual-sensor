@@ -26,7 +26,7 @@ void SensorLogger::_setupLogger(const std::string loggerName)
 {
     // TODO: Need to replace these hard-code variable by reading from config file
 
-    const std::string LOG_PATTERN = "%Y-%m-%d %H:%M:%S %z - %-6l - [thread-%t@%s:%#] %v";
+    const std::string LOG_PATTERN = "%Y-%m-%d %H:%M:%S.%e %z - %-6l - [thread-%t@%s:%#] %v";
     const std::string LOG_DIR = "logs";
     const std::string DEBUG_FILE_NAME = "virtual_sensor_debug.log";
     const std::string ERROR_FILE_NAME = "virtual_sensor_error.log";
