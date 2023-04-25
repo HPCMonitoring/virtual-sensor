@@ -3,6 +3,7 @@
 #include <utility>
 #include "exceptions.h"
 #include "repository/repository.h"
+#include "sensor_logger.h"
 
 KakfaClient::KakfaClient(const std::string &clientId, const std::string &brokerUrl)
 {
@@ -41,6 +42,9 @@ KakfaClient::Worker *KakfaClient::addWorker(KakfaClient::WorkerProp *prop)
 KakfaClient::Worker::Worker(std::shared_ptr<RdKafka::Producer> handler, WorkerProp *prop)
 {
     std::string errMsg;
+    this->logger = SensorLogger::getInstance()->getLogger();
+
+    SPDLOG_LOGGER_INFO(this->logger, "Create worker {} for topic {}", std::to_string(long(this)), prop->topicName);
     this->prop = prop;
     RdKafka::Topic *topic = RdKafka::Topic::create(handler.get(), this->prop->topicName, NULL, errMsg);
     this->topic = topic;
@@ -63,8 +67,10 @@ void KakfaClient::Worker::_sendMessage()
     {
         try
         {
+            SPDLOG_LOGGER_INFO(this->logger, "Worker {} begins getting data", std::to_string(long(this)));
             std::vector<std::string> records = r.getData(this->prop->filter);
             const size_t numOfRecords = records.size();
+            SPDLOG_LOGGER_INFO(this->logger, "Worker {} found {} records", std::to_string(long(this)),  numOfRecords);
             for (size_t i = 0; i < numOfRecords; ++i)
             {
                 std::stringstream ss;
@@ -91,7 +97,7 @@ void KakfaClient::Worker::_sendMessage()
         catch (std::exception &exception)
         {
             // TODO: SPD log error here
-            std::cout << exception.what();
+            SPDLOG_LOGGER_ERROR(this->logger, "Fail to send message to kafka with error message: {}", exception.what());
         }
         std::this_thread::sleep_for(std::chrono::seconds(this->prop->interval));
     }
@@ -107,6 +113,8 @@ void KakfaClient::Worker::stop()
 
 KakfaClient::Worker::~Worker()
 {
+    SPDLOG_LOGGER_INFO(this->logger, "Destructor of worker {} for topic {} is called", std::to_string(long(this)), prop->topicName);
+
     // Gracefully terminate thread
     this->stopFlag.store(true, std::memory_order_release);
     delete this->topic;

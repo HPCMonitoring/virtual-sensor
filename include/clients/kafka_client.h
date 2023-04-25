@@ -26,6 +26,7 @@ public:
     class Worker
     {
     private:
+        std::shared_ptr<spdlog::logger> logger;
         std::shared_ptr<RdKafka::Producer> handler;
         RdKafka::Topic *topic;
         WorkerProp* prop;
