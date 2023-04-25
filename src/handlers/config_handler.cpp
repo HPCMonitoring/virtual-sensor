@@ -15,7 +15,6 @@ void ConfigHandler::handle(ClientConnector *responder, const WsMessage &msg)
     {
         try
         {
-            // TODO: Validate type
             // Create worker
             const std::string type = topic["type"];
             const std::string topicName = topic["topicName"];

@@ -37,14 +37,14 @@ void readSampleDisk();
 
 int main(int argc, char *argv[])
 {
-    signal(SIGINT, signalHandler);
-    mainThread = std::thread(mainThreadHandler);
-    mainThread.join();
+    // signal(SIGINT, signalHandler);
+    // mainThread = std::thread(mainThreadHandler);
+    // mainThread.join();
 
     // readSampleProc();
     // readSampleCpu();
     // readSampleMemory();
-    // readSampleNetwork();
+    readSampleNetwork();
     // readSampleIO();
     // readSampleDisk();
 

@@ -116,6 +116,7 @@ std::vector<std::string> Repository::getData(const Filter *filter)
             IOStat io = IOStat(line);
             results.push_back(filter->iterateIO(&io));
         }
+        pclose(pipe);
     }
     else if (filter->datatype == DISK)
     {
@@ -140,6 +141,7 @@ std::vector<std::string> Repository::getData(const Filter *filter)
             DiskUsage disk = DiskUsage(line);
             results.push_back(filter->iterateDiskUsage(&disk));
         }
+        pclose(pipe);
     }
 
     return results;

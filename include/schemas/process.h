@@ -2,6 +2,7 @@
 #define __PROCESS_H__
 
 #include "main.h"
+#include "sensor_logger.h"
 
 #define CLOCK_PER_MILISECS 1000.0
 #define BUFFER_SIZE 5000
@@ -46,6 +47,7 @@ private:
 
 private:
     std::string entryDirname;
+    std::string netNs; // Network namespace
 
 public:
     Process(pid_t);
@@ -73,6 +75,11 @@ private:
     inline void _readStatmFile();
     inline void _readSmapsRollupFile();
     inline void _readIoFile();
+    /**
+     * @brief Set up network namespace for process
+     */
+    inline void _setUpNetNs();
+    inline void _readNetworkStat();
 };
 
 #endif
