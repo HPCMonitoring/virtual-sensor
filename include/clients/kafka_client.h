@@ -39,7 +39,6 @@ public:
 
     private:
         void _sendMessage();
-
     };
 
     class WorkerProp {
@@ -47,7 +46,8 @@ public:
         const std::string topicName;
         const Filter *filter;
         const time_t interval;
-        WorkerProp(const std::string &topicName, Filter* filter, const time_t interval);
+        std::unordered_map<std::string, std::string> headers;
+        WorkerProp(std::string topicName, Filter* filter, const time_t interval, std::unordered_map<std::string, std::string> headers);
         ~WorkerProp();
     };
 };

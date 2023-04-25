@@ -41,7 +41,7 @@ void ConfigHandler::handle(ClientConnector *responder, const WsMessage &msg)
             }
 
             auto *filter = new Filter(PROCESS, projection, prefixCommand);
-            auto *workerProp = new KakfaClient::WorkerProp(topicName, filter, interval);
+            auto *workerProp = new KakfaClient::WorkerProp(topicName, filter, interval, responder->getMetadata());
             std::pair<std::string, KakfaClient::WorkerProp*> pair (brokerUrl, workerProp);
 
             jobs.push_back(pair);

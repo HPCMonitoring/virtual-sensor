@@ -51,7 +51,7 @@ bool RelationalExpr::validate(Process *proc) const
         else if (this->operand == N_EXEC_PATH)
             compareValue = proc->getExecutePath();
 
-        return std::regex_match(compareValue.begin(), compareValue.end(), literalRegex);
+        return std::regex_search(compareValue.begin(), compareValue.end(), literalRegex);
     }
     if (this->op == LT_OP || this->op == LTE_OP || this->op == GT_OP || this->op == GTE_OP)
     {

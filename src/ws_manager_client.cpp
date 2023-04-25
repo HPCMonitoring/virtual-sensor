@@ -185,3 +185,26 @@ void SensorManagerClient::run()
         SPDLOG_LOGGER_INFO(this->_logger, std::string("Error in run websocket client with message: ").append(e.what()));
     }
 }
+
+std::unordered_map<std::string, std::string> SensorManagerClient::getMetadata() {
+    try
+    {
+        const std::string PREFIX = "ss.";
+        std::unordered_map<std::string, std::string> metadata;
+        metadata.insert({PREFIX + "cluster", this->_config.value("cluster", "")});
+        metadata.insert({PREFIX + "name", this->_config.value("name", "")});
+        metadata.insert({PREFIX + "id", this->_config.value("id", "")});
+
+        return metadata;
+    }
+    catch (const std::exception &e)
+    {
+        std::stringstream ss;
+        ss << "getMetadata error with message: " << e.what();
+        SPDLOG_LOGGER_ERROR(this->_logger, ss.str());
+    }
+
+
+    std::unordered_map<std::string, std::string> empty;
+    return empty;
+}

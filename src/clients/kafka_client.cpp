@@ -1,4 +1,6 @@
 #include "clients/kafka_client.h"
+
+#include <utility>
 #include "exceptions.h"
 #include "repository/repository.h"
 
@@ -9,7 +11,6 @@ KakfaClient::KakfaClient(const std::string &clientId, const std::string &brokerU
     conf->set("client.id", clientId, errstr);
     conf->set("bootstrap.servers", brokerUrl, errstr);
     conf->set("linger.ms", "500", errstr);
-    conf->set("compression.type", "snappy", errstr);
     conf->set("acks", "0", errstr);
 
     RdKafka::Producer *kafkaProducer = RdKafka::Producer::create(conf, errstr);
@@ -66,11 +67,22 @@ void KakfaClient::Worker::_sendMessage()
             const size_t numOfRecords = records.size();
             for (size_t i = 0; i < numOfRecords; ++i)
             {
+                std::stringstream ss;
+                ss << records.at(i);
+                ss.seekp(-1, std::ios_base::end);
+                for (auto const &x : this->prop->headers)
+                {
+                    ss << ",\"" << x.first << "\":\"" << x.second << "\"";
+                }
+                ss << "}";
+
+                std::string payload = ss.str();
+
                 this->handler->produce(this->topic,
                                        RdKafka::Topic::PARTITION_UA,
                                        RdKafka::Producer::RK_MSG_COPY,
-                                       const_cast<char *>(records.at(i).c_str()),
-                                       records.at(i).size(),
+                                       const_cast<char *>(payload.c_str()),
+                                       payload.size(),
                                        NULL,  // Key
                                        0,     // Key length
                                        NULL); // Opaque value
@@ -101,7 +113,8 @@ KakfaClient::Worker::~Worker()
     delete this->prop;
 }
 
-KakfaClient::WorkerProp::WorkerProp(const std::string &topicName, Filter *filter, const time_t interval) : topicName(topicName), filter(filter), interval(interval)
+KakfaClient::WorkerProp::WorkerProp(std::string topicName, Filter *filter, const time_t interval, std::unordered_map<std::string, std::string> headers)
+    : topicName(std::move(topicName)), filter(filter), interval(interval), headers(std::move(headers))
 {
     // do nothing
 }
