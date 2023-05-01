@@ -1,9 +1,8 @@
-#ifndef VIRTUAL_SENSOR_SYS_INFO_H
-#define VIRTUAL_SENSOR_SYS_INFO_H
+#ifndef __VIRTUAL_SENSOR_SYS_INFO_H__
+#define __VIRTUAL_SENSOR_SYS_INFO_H__
 
-
-#include <string>
-#include "schema/json_serializable.h"
+#include "schemas/json_serializable.h"
+#include <boost/format.hpp>
 
 class SysInfo : public JsonSerializable{
 public:

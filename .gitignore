@@ -3,7 +3,7 @@ vsensor
 .vscode
 *.txt
 logs
-wsconfig.json
 cmake-build-debug
 .idea
 *.json
+!wsconfig.example.json

@@ -1,9 +1,13 @@
-#ifndef __SENSOR_LOGGER__
-#define __SENSOR_LOGGER__
+#ifndef __SENSOR_LOGGER_H__
+#define __SENSOR_LOGGER_H__
 
 #include <mutex>
-#include <spdlog/spdlog.h>
+#include <string>
 #include <unordered_set>
+#include <memory>
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/rotating_file_sink.h>
 
 class SensorLogger
 {

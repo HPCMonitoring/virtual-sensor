@@ -1,6 +1,4 @@
-#include <fstream>
-#include <boost/format.hpp>
-#include <ws_manager_client.h>
+#include "ws_manager_client.h"
 #include "handlers/plain_json_str.h"
 
 SensorManagerClient *SensorManagerClient::_pinstance{nullptr};
@@ -15,7 +13,6 @@ SensorManagerClient::SensorManagerClient()
     this->_stopFlag = false;
     std::ifstream f(CONF_F_NAME);
     if (f.is_open())
-
     {
         SPDLOG_LOGGER_INFO(this->_logger, "Enter reading config file");
         this->_config = json::parse(f);
@@ -23,7 +20,7 @@ SensorManagerClient::SensorManagerClient()
     }
 }
 
-SensorManagerClient *SensorManagerClient::GetInstance()
+SensorManagerClient *SensorManagerClient::getInstance()
 {
     std::lock_guard<std::mutex> lock(_mutex);
     if (_pinstance == nullptr)
@@ -36,13 +33,17 @@ SensorManagerClient *SensorManagerClient::GetInstance()
 std::string SensorManagerClient::buildConnStr()
 {
     std::string conn = "ws://";
-
-    std::string spaceReplacement = "%20";
     conn.append(this->_config["server"]).append("/ws").append("?");
-    conn.append("&cluster=").append(myutil::strReplace(this->_config["cluster"], " ", spaceReplacement));
-    conn.append("&name=").append(myutil::strReplace(this->_config["name"], " ", spaceReplacement));
-    if (this->_config.contains("id")) {
-        conn.append("&id=").append(myutil::strReplace(this->_config["id"], " ", spaceReplacement));
+
+    std::string clusterParam = std::regex_replace(std::string(this->_config["cluster"]), std::regex(" "), URL_SPACE);
+    std::string nameParam = std::regex_replace(std::string(this->_config["name"]), std::regex(" "), URL_SPACE);
+    conn.append("&cluster=").append(clusterParam);
+    conn.append("&name=").append(nameParam);
+
+    if (this->_config.contains("id"))
+    {
+        std::string idParam = std::regex_replace(std::string(this->_config["id"]), std::regex(" "), URL_SPACE);
+        conn.append("&id=").append(idParam);
     }
     return conn;
 }
@@ -62,13 +63,14 @@ void SensorManagerClient::on_message(const ix::WebSocketMessagePtr &msg)
     try
     {
         const auto cmd = msgJson["cmd"].get<WsCommand>();
-        if (_fmap.count(cmd) > 0) {
+        if (_fmap.count(cmd) > 0)
+        {
             WsMessage message;
             message.cmd = cmd;
             message.msg = msgJson.contains("message") ? msgJson["message"].get<std::string>() : "";
             message.error = msgJson.contains("error") ? msgJson["error"].get<int>() : 0;
             message.coordId = msgJson.contains("coordId") ? msgJson["coordId"].get<std::string>() : "";
-            auto *plainJsonStr = new PlainJsonStr( msgJson["payload"].dump());
+            auto *plainJsonStr = new PlainJsonStr(msgJson["payload"].dump());
             message.payload = plainJsonStr;
             _fmap.at(cmd)->handle(this, message);
         }
@@ -78,7 +80,6 @@ void SensorManagerClient::on_message(const ix::WebSocketMessagePtr &msg)
                 this->_logger,
                 boost::str(boost::format("no handler for command: %s") % cmd));
         }
-
     }
     catch (const std::exception &e)
     {
@@ -111,15 +112,15 @@ void SensorManagerClient::on_close(const ix::WebSocketMessagePtr &msg)
 
 void SensorManagerClient::setupAndStart()
 {
-    while(!this->_stopFlag) {
+    while (!this->_stopFlag)
+    {
         std::thread thread_obj(&SensorManagerClient::run, this);
         thread_obj.join();
         SPDLOG_LOGGER_INFO(
             this->_logger,
             boost::str(boost::format("websocket client run done and start re-run in next %d sec") % this->_nextConnRetry));
-        std::this_thread::sleep_for (std::chrono::seconds(this->_nextConnRetry));
+        std::this_thread::sleep_for(std::chrono::seconds(this->_nextConnRetry));
     }
-
 }
 
 void SensorManagerClient::send(const WsMessage &res)
@@ -127,16 +128,18 @@ void SensorManagerClient::send(const WsMessage &res)
     _webSocket.send(res.toJson());
 }
 
-void SensorManagerClient::onIdChange(std::string id) {
+void SensorManagerClient::onIdChange(std::string id)
+{
     this->_config["id"] = id;
-    std::ofstream outfile (CONF_F_NAME, std::ios::trunc);
+    std::ofstream outfile(CONF_F_NAME, std::ios::trunc);
     outfile << this->_config.dump();
     outfile.close();
 }
 
 SensorManagerClient::~SensorManagerClient()
 {
-    for(auto kv : this->_fmap) {
+    for (auto kv : this->_fmap)
+    {
         delete kv.second;
     }
 }
@@ -177,5 +180,4 @@ void SensorManagerClient::run()
     {
         SPDLOG_LOGGER_INFO(this->_logger, std::string("Error in run websocket client with message: ").append(e.what()));
     }
-
 }

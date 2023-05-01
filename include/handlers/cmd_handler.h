@@ -1,10 +1,9 @@
-#ifndef VIRTUAL_SENSOR_CMD_HANDLER_H
-#define VIRTUAL_SENSOR_CMD_HANDLER_H
+#ifndef __VIRTUAL_SENSOR_CMD_HANDLER_H__
+#define __VIRTUAL_SENSOR_CMD_HANDLER_H__
 
-
+#include "handlers/ws_message.h"
+#include "client_connector.h"
 #include <nlohmann/json.hpp>
-#include <handlers/ws_message.h>
-#include <client_connector.h>
 
 using json = nlohmann::json;
 
