@@ -1,5 +1,4 @@
 #include "handlers/auth_handler.h"
-#include <boost/format.hpp>
 
 AuthHandler::AuthHandler()
 {

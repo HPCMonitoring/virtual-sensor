@@ -1,13 +1,16 @@
 #ifndef __FILTER_H__
 #define __FILTER_H__
 
-#include "main.h"
 #include "schemas/process.h"
 #include "schemas/network_interface.h"
 #include "schemas/memory.h"
 #include "schemas/cpu.h"
 #include "schemas/io.h"
 #include "schemas/disk_usage.h"
+#include <iostream>
+#include <stack>
+#include <regex>
+#include <iomanip>
 
 #define AND_OP "&&"
 #define OR_OP "||"

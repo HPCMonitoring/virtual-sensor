@@ -1,8 +1,11 @@
 #ifndef __KAFKA_CLIENT_H__
 #define __KAFKA_CLIENT_H__
 
-#include "main.h"
+#include <librdkafka/rdkafkacpp.h>
 #include "repository/filter.h"
+#include <iostream>
+#include "exceptions.h"
+#include "repository/repository.h"
 
 class KakfaClient
 {

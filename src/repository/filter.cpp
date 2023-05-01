@@ -51,7 +51,7 @@ bool RelationalExpr::validate(Process *proc) const
         else if (this->operand == N_EXEC_PATH)
             compareValue = proc->getExecutePath();
 
-        return std::regex_match(compareValue.begin(), compareValue.end(), literalRegex);
+        return std::regex_search(compareValue.begin(), compareValue.end(), literalRegex);
     }
     if (this->op == LT_OP || this->op == LTE_OP || this->op == GT_OP || this->op == GTE_OP)
     {
@@ -65,14 +65,16 @@ bool RelationalExpr::validate(Process *proc) const
         else if (this->operand == N_CPUU)
             compareValueStr = proc->getCpuUsage();
         else if (this->operand == N_NETIN)
-            compareValueStr = proc->getNetworkInBandwidth();
+            compareValueStr = proc->getNetworkIn();
         else if (this->operand == N_NETOUT)
-            compareValueStr = proc->getNetworkOutBandwidth();
+            compareValueStr = proc->getNetworkOut();
         else if (this->operand == N_IOR)
             compareValueStr = proc->getReadKBs();
         else if (this->operand == N_IOW)
             compareValueStr = proc->getWriteKBs();
 
+        if(compareValueStr == "null") return false;
+        
         const double compareValue = compareValueStr.length() > 0 ? std::stod(compareValueStr) : -1.0;
         const double literalValue = std::stod(this->literal);
         return compare<double>(compareValue, literalValue, this->op);
@@ -255,9 +257,9 @@ std::string Filter::iterateProc(Process *proc) const
         else if (this->projection.at(i).name == N_CPUU)
             jsonAttrStr.append(proc->getCpuUsage());
         else if (this->projection.at(i).name == N_NETIN)
-            jsonAttrStr.append(proc->getNetworkInBandwidth());
+            jsonAttrStr.append(proc->getNetworkIn());
         else if (this->projection.at(i).name == N_NETOUT)
-            jsonAttrStr.append(proc->getNetworkOutBandwidth());
+            jsonAttrStr.append(proc->getNetworkOut());
         else if (this->projection.at(i).name == N_IOR)
             jsonAttrStr.append(proc->getReadKBs());
         else if (this->projection.at(i).name == N_IOW)

@@ -1,6 +1,4 @@
 #include "clients/kafka_client.h"
-#include "exceptions.h"
-#include "repository/repository.h"
 
 KakfaClient::KakfaClient(const std::string &clientId, const std::string &brokerUrl)
 {

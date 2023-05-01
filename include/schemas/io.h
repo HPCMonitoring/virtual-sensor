@@ -1,7 +1,9 @@
 #ifndef __IO_H__
 #define __IO_H__
 
-#include "main.h"
+#include <string>
+#include <sstream>
+#include <algorithm>
 
 class IOStat {
 public:

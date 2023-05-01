@@ -1,7 +1,8 @@
 #ifndef __CPU_H__
 #define __CPU_H__
 
-#include "main.h"
+#include <string>
+#include <sstream>
 
 class Cpu
 {

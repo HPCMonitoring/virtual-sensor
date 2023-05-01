@@ -1,7 +1,9 @@
 #ifndef __DISK_USAGE_H__
 #define __DISK_USAGE_H__
 
-#include "main.h"
+#include <string>
+#include <sstream>
+
 class DiskUsage
 {
 public:

@@ -1,7 +1,9 @@
 #ifndef __MEMORY_H__
 #define __MEMORY_H__
 
-#include "main.h"
+#include <string>
+#include <fstream>
+#include <sstream>
 
 class Memory
 {

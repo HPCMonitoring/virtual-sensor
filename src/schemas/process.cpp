@@ -1,6 +1,7 @@
 #include "schemas/process.h"
 #include "exceptions.h"
 
+
 inline bool fileExists(const std::string &name)
 {
     struct stat buffer;
@@ -138,13 +139,13 @@ std::string Process::getCpuTime()
 
 std::string Process::getCpuUsage()
 {
-    if (this->cpuUsage.length() >= 0)
+    if (this->cpuUsage.length() > 0)
         return this->cpuUsage;
 
     std::string command = "ps -p " + this->pid + " -o \%cpu";
     FILE *pipe = popen(command.c_str(), "r");
 
-    char buffer[20];
+    char buffer[100];
     short lineNumber = 0;
 
     while (!feof(pipe) && fgets(buffer, 20, pipe) != nullptr)
@@ -156,8 +157,8 @@ std::string Process::getCpuUsage()
         }
         lineNumber++;
     }
-    pclose(pipe);
 
+    pclose(pipe);
     if (this->cpuUsage.length() > 2)
         this->cpuUsage.pop_back();   // Remove \n character
     if (this->cpuUsage.length() > 0) // String can be empty if no CPU usage
@@ -219,24 +220,24 @@ inline void Process::_readStatFile()
     statFile.close();
 }
 
-std::string Process::getNetworkInBandwidth()
+std::string Process::getNetworkIn()
 {
-    if (this->networkInBandwidth.length() == 0)
+    if (this->networkIn.length() == 0)
     {
         this->_readNetworkStat();
-        NULLIFY(this->networkInBandwidth);
+        NULLIFY(this->networkIn);
     }
-    return this->networkInBandwidth;
+    return this->networkIn;
 }
 
-std::string Process::getNetworkOutBandwidth()
+std::string Process::getNetworkOut()
 {
-    if (this->networkOutBandwidth.length() == 0)
+    if (this->networkOut.length() == 0)
     {
         this->_readNetworkStat();
-        NULLIFY(this->networkOutBandwidth);
+        NULLIFY(this->networkOut);
     }
-    return this->networkOutBandwidth;
+    return this->networkOut;
 }
 
 inline void Process::_setUpNetNs()
@@ -244,7 +245,7 @@ inline void Process::_setUpNetNs()
     const std::string netNsPath = "/var/run/netns/" + this->netNs;
     if (fileExists(netNsPath))
         return;
-    symlink((this->entryDirname + "net/ns").c_str(), netNsPath.c_str());
+    symlink((this->entryDirname + "ns/net").c_str(), netNsPath.c_str());
 }
 
 inline void Process::_readNetworkStat()
@@ -266,7 +267,7 @@ inline void Process::_readNetworkStat()
             char type[4];
             unsigned long long bytes;
             // TX packets 1929747  bytes 481364580 (481.3 MB)
-            if (sscanf(line, "%s %*s %*llu %*s %llu %*s %*s") == 1)
+            if (sscanf(line, "%s %*s %*s %*s %llu %*s %*s", type, &bytes) == 1)
             {
                 if (type == "RX")
                     totalRxBytes += bytes;
@@ -278,8 +279,8 @@ inline void Process::_readNetworkStat()
         pclose(pipe);
     }
 
-    this->networkInBandwidth = fromBytesToKBs((double)totalRxBytes);  // convert to KBs
-    this->networkOutBandwidth = fromBytesToKBs((double)totalTxBytes); // convert to KBs
+    this->networkIn = fromBytesToKBs((double)totalRxBytes);  // convert to KBs
+    this->networkOut = fromBytesToKBs((double)totalTxBytes); // convert to KBs
 }
 
 inline void Process::_readCommFile()
@@ -368,6 +369,5 @@ inline void Process::_readIoFile()
 
     this->readKBs = fromBytesToKBs(readBytes);
     this->writeKBs = fromBytesToKBs(writeBytes);
-
     ioFile.close();
 }

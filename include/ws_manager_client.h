@@ -1,6 +1,11 @@
 #ifndef __SENSOR_MANAGER_WEBSOCKET_CLIENT_H__
 #define __SENSOR_MANAGER_WEBSOCKET_CLIENT_H__
 
+#include <mutex>
+#include <fstream>
+#include <regex>
+#include <ixwebsocket/IXNetSystem.h>
+#include <ixwebsocket/IXWebSocket.h>
 #include "sensor_logger.h"
 #include "client_connector.h"
 #include "handlers/cmd_handler.h"

@@ -1,6 +1,5 @@
 #include "handlers/config_handler.h"
 #include "worker_repository.h"
-#include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 

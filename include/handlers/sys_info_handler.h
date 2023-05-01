@@ -3,6 +3,7 @@
 
 #include "cmd_handler.h"
 #include "schemas/sys_info.h"
+#include <sys/utsname.h>
 
 class SysInfoHandler : public CmdHandler {
 public:

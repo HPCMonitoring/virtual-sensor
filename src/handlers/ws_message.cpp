@@ -1,4 +1,3 @@
-#include <boost/format.hpp>
 #include "handlers/ws_message.h"
 
 WsMessage::WsMessage()

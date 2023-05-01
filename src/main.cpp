@@ -4,6 +4,7 @@
 #include "handlers/config_handler.h"
 #include "repository/repository.h"
 #include "repository/filter.h"
+#include <iostream>
 
 std::thread mainThread;
 SensorManagerClient *client;
@@ -41,10 +42,10 @@ int main(int argc, char *argv[])
     // mainThread = std::thread(mainThreadHandler);
     // mainThread.join();
 
-    // readSampleProc();
+    readSampleProc();
     // readSampleCpu();
     // readSampleMemory();
-    readSampleNetwork();
+    // readSampleNetwork();
     // readSampleIO();
     // readSampleDisk();
 
@@ -61,18 +62,18 @@ void readSampleProc()
     attrs.push_back(Attribute("parentPid"));
     attrs.push_back(Attribute("uid"));
     attrs.push_back(Attribute("gid"));
-    attrs.push_back(Attribute("executePath"));
-    attrs.push_back(Attribute("command"));
+    // attrs.push_back(Attribute("executePath"));
+    // attrs.push_back(Attribute("command"));
     attrs.push_back(Attribute("virtualMemory"));
     attrs.push_back(Attribute("physicalMemory"));
     attrs.push_back(Attribute("cpuTime"));
     attrs.push_back(Attribute("cpuUsage"));
-    attrs.push_back(Attribute("networkInBandwidth"));
-    attrs.push_back(Attribute("networkOutBandwidth"));
+    attrs.push_back(Attribute("networkIn"));
+    attrs.push_back(Attribute("networkOut"));
     attrs.push_back(Attribute("readKBs"));
     attrs.push_back(Attribute("writeKBs"));
 
-    Filter filter(PROCESS, attrs, "%= executePath .*slack.*");
+    Filter filter(PROCESS, attrs, "%= executePath discord");
     Repository &r = Repository::getInstance();
 
     auto data = r.getData(&filter);

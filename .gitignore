@@ -6,4 +6,4 @@ logs
 cmake-build-debug
 .idea
 *.json
-!vsconfig.example.json
+!wsconfig.example.json
