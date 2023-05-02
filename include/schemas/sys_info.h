@@ -2,6 +2,7 @@
 #define __VIRTUAL_SENSOR_SYS_INFO_H__
 
 #include "schemas/json_serializable.h"
+#include <boost/format.hpp>
 
 class SysInfo : public JsonSerializable{
 public:

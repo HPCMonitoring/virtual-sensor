@@ -1,7 +1,5 @@
 #include "handlers/config_handler.h"
 #include "worker_repository.h"
-#include "sensor_logger.h"
-#include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
@@ -25,7 +23,6 @@ void ConfigHandler::handle(ClientConnector *responder, const WsMessage &msg)
     {
         try
         {
-            // TODO: Validate type
             // Create worker
             const std::string type = topic["type"];
             const std::string topicName = topic["topicName"];

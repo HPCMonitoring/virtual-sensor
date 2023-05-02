@@ -3,6 +3,7 @@
 
 #include "handlers/ws_message.h"
 #include "client_connector.h"
+#include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 

@@ -1,7 +1,13 @@
 #ifndef __SENSOR_LOGGER_H__
 #define __SENSOR_LOGGER_H__
 
-#include "main.h"
+#include <mutex>
+#include <string>
+#include <unordered_set>
+#include <memory>
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/rotating_file_sink.h>
 
 class SensorLogger
 {
@@ -24,6 +30,7 @@ public:
     SensorLogger(SensorLogger &other) = delete;
     void operator=(const SensorLogger &) = delete;
     std::shared_ptr<spdlog::logger> getLogger(std::string loggerName = "");
+    ~SensorLogger();
 };
 
 #endif

@@ -1,8 +1,8 @@
 #ifndef __VIRTUAL_SENSOR_WS_MESSAGE_H__
 #define __VIRTUAL_SENSOR_WS_MESSAGE_H__
 
-#include "main.h"
 #include "schemas/json_serializable.h"
+#include <boost/format.hpp>
 
 enum WsCommand {
     AUTH = 1000,

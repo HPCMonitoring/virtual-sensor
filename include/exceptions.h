@@ -1,8 +1,6 @@
 #ifndef __EXCEPTIONS_H__
 #define __EXCEPTIONS_H__
 
-#include "main.h"
-
 #define ERR_PROCESS_NOT_EXISTS "Process does not exists !"
 #define ERR_INVALID_PID "Invalid process's ID !"
 #define ERR_UNIMPLEMENTED "Unimplemented !"

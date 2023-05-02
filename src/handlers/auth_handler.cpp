@@ -1,5 +1,4 @@
 #include "handlers/auth_handler.h"
-#include <sstream>
 
 AuthHandler::AuthHandler() {
     this->_logger = SensorLogger::getInstance()->getLogger();

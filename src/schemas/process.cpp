@@ -7,6 +7,14 @@ inline bool fileExists(const std::string &name)
     return (stat(name.c_str(), &buffer) == 0);
 }
 
+inline std::string fromBytesToKBs(double number)
+{
+    std::ostringstream oss;
+    oss.precision(0);
+    oss << std::fixed << std::round(number / 1024);
+    return oss.str();
+}
+
 Process::Process(pid_t pid)
 {
     if (pid < 0)
@@ -14,6 +22,7 @@ Process::Process(pid_t pid)
 
     this->pid = std::to_string(pid);
     this->entryDirname = "/proc/" + this->pid;
+    this->netNs = "bkvspr-" + this->pid;
     if (!fileExists(this->entryDirname + "/status"))
     {
         this->_exists = false;
@@ -100,76 +109,81 @@ std::string Process::getCommand()
 std::string Process::getVirtualMemory()
 {
     if (this->virtualMemory.length() == 0)
+    {
         this->_readStatmFile();
-
+        NULLIFY(this->virtualMemory);
+    }
     return this->virtualMemory;
 }
 
 std::string Process::getPhysicalMemory()
 {
     if (this->physicalMemory.length() == 0)
+    {
         this->_readSmapsRollupFile();
+        NULLIFY(this->physicalMemory);
+    }
     return this->physicalMemory;
 }
 
 std::string Process::getCpuTime()
 {
     if (this->cpuTime.length() == 0)
+    {
         this->_readStatFile();
+        NULLIFY(this->cpuTime);
+    }
     return this->cpuTime;
 }
 
 std::string Process::getCpuUsage()
 {
+    if (this->cpuUsage.length() > 0)
+        return this->cpuUsage;
+
     std::string command = "ps -p " + this->pid + " -o \%cpu";
     FILE *pipe = popen(command.c_str(), "r");
 
-    char buffer[20];
-    std::string result;
+    char buffer[100];
     short lineNumber = 0;
 
     while (!feof(pipe) && fgets(buffer, 20, pipe) != nullptr)
     {
         if (lineNumber == 1)
         {
-            result += buffer;
+            this->cpuUsage.append(buffer);
             break;
         }
         lineNumber++;
     }
+
     pclose(pipe);
+    if (this->cpuUsage.length() > 2)
+        this->cpuUsage.pop_back();   // Remove \n character
+    if (this->cpuUsage.length() > 0) // String can be empty if no CPU usage
+        this->cpuUsage.erase(0, 1);  // Remove whitespace character
 
-    if (result.length() > 2)
-        result.pop_back();   // Remove \n character
-    if (result.length() > 0) // String can be empty if no CPU usage
-        result.erase(0, 1);  // Remove whitespace character
-
-    return result.length() > 0 ? result : "0";
-}
-
-// TODO
-std::string Process::getNetworkInBandwidth()
-{
-    return "null";
-}
-
-// TODO
-std::string Process::getNetworkOutBandwidth()
-{
-    return "null";
+    NULLIFY(this->cpuUsage);
+    return this->cpuUsage;
 }
 
 std::string Process::getReadKBs()
 {
     if (this->readKBs.length() == 0)
+    {
         this->_readIoFile();
+        NULLIFY(this->readKBs);
+    }
     return this->readKBs;
 }
 
 std::string Process::getWriteKBs()
 {
     if (this->writeKBs.length() == 0)
+    {
         this->_readIoFile();
+        NULLIFY(this->writeKBs);
+    }
     return this->writeKBs;
 }
 
@@ -203,6 +217,69 @@ inline void Process::_readStatFile()
     this->cpuTime = oss.str();
 
     statFile.close();
+}
+
+std::string Process::getNetworkIn()
+{
+    if (this->networkIn.length() == 0)
+    {
+        this->_readNetworkStat();
+        NULLIFY(this->networkIn);
+    }
+    return this->networkIn;
+}
+
+std::string Process::getNetworkOut()
+{
+    if (this->networkOut.length() == 0)
+    {
+        this->_readNetworkStat();
+        NULLIFY(this->networkOut);
+    }
+    return this->networkOut;
+}
+
+inline void Process::_setUpNetNs()
+{
+    const std::string netNsPath = "/var/run/netns/" + this->netNs;
+    mkdir("/var/run/netns", 0777);
+    if (fileExists(netNsPath))
+        return;
+    symlink((this->entryDirname + "/ns/net").c_str(), netNsPath.c_str());
+}
+
+inline void Process::_readNetworkStat()
+{
+    this->_setUpNetNs();
+
+    const std::string cmd = "ip netns exec " + this->netNs + " ifconfig -a | grep -E \'RX packets|TX packets\'";
+    FILE *pipe = popen(cmd.c_str(), "r");
+    auto logger = SensorLogger::getInstance()->getLogger();
+
+    unsigned long long totalRxBytes = 0, totalTxBytes = 0;
+    if (!pipe)
+        SPDLOG_LOGGER_ERROR(logger, "Debug: {}", "Network namespace not exists or device not found!");
+    else
+    {
+        char line[512];
+        while (fgets(line, sizeof(line), pipe))
+        {
+            char type[4];
+            unsigned long long bytes;
+            // TX packets 1929747  bytes 481364580 (481.3 MB)
+            sscanf(line, "%s %*s %*s %*s %llu %*s %*s", type, &bytes);
+
+            if (strcmp(type, "RX") == 0)
+                totalRxBytes += bytes;
+            else if (strcmp(type, "TX") == 0)
+                totalTxBytes += bytes;
+        }
+
+        pclose(pipe);
+    }
+
+    this->networkIn = fromBytesToKBs((double)totalRxBytes);  // convert to KBs
+    this->networkOut = fromBytesToKBs((double)totalTxBytes); // convert to KBs
 }
 
 inline void Process::_readCommFile()
@@ -288,15 +365,8 @@ inline void Process::_readIoFile()
             break; // No need to continue
         }
     }
-    std::ostringstream ossRead;
-    ossRead.precision(0);
-    ossRead << std::fixed << std::round(readBytes / 1024);
-    this->readKBs = ossRead.str();
 
-    std::ostringstream ossWrite;
-    ossWrite.precision(0);
-    ossWrite << std::fixed << std::round(writeBytes / 1024);
-    this->writeKBs = ossWrite.str();
-
+    this->readKBs = fromBytesToKBs(readBytes);
+    this->writeKBs = fromBytesToKBs(writeBytes);
     ioFile.close();
 }

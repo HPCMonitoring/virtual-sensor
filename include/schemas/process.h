@@ -1,7 +1,13 @@
 #ifndef __PROCESS_H__
 #define __PROCESS_H__
 
-#include "main.h"
+#include "sensor_logger.h"
+#include <string>
+#include <sstream>
+#include <fstream>
+#include <regex>
+
+#define NULLIFY(str) str = (str.length() == 0 ? "null" : str)
 
 #define CLOCK_PER_MILISECS 1000.0
 #define BUFFER_SIZE 5000
@@ -17,8 +23,8 @@
 #define N_PMU "physicalMemory"
 #define N_CPUT "cpuTime"
 #define N_CPUU "cpuUsage"
-#define N_NETIN "networkInBandwidth"
-#define N_NETOUT "networkOutBandwidth"
+#define N_NETIN "networkIn"
+#define N_NETOUT "networkOut"
 #define N_IOR "readKBs"
 #define N_IOW "writeKBs"
 
@@ -38,14 +44,15 @@ private:
     std::string physicalMemory;
     std::string cpuTime;
     std::string cpuUsage;
-    std::string networkInBandwidth; // What interface ???
-    std::string networkOutBandwidth;
+    std::string networkIn;
+    std::string networkOut;
     std::string readKBs;  // In KB
     std::string writeKBs; // In KB
     bool _exists;
 
 private:
     std::string entryDirname;
+    std::string netNs; // Network namespace
 
 public:
     Process(pid_t);
@@ -61,8 +68,8 @@ public:
     std::string getPhysicalMemory(); // In KB
     std::string getCpuTime();        // In ms
     std::string getCpuUsage();       // In %
-    std::string getNetworkInBandwidth();
-    std::string getNetworkOutBandwidth();
+    std::string getNetworkIn();      // In KB
+    std::string getNetworkOut();     // In KB
     std::string getWriteKBs();
     std::string getReadKBs();
 
@@ -73,6 +80,11 @@ private:
     inline void _readStatmFile();
     inline void _readSmapsRollupFile();
     inline void _readIoFile();
+    /**
+     * @brief Set up network namespace for process
+     */
+    inline void _setUpNetNs();
+    inline void _readNetworkStat();
 };
 
 #endif

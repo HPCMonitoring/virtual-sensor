@@ -18,7 +18,6 @@
 #include <unordered_set>
 #include <sys/utsname.h>
 #include <sys/stat.h>
-// #include <pcap.h>
 #include <boost/format.hpp>
 #include <librdkafka/rdkafkacpp.h>
 #include <spdlog/spdlog.h>
@@ -29,6 +28,5 @@
 #include <ixwebsocket/IXUserAgent.h>
 #include <nlohmann/json.hpp>
 
-#define NULLIFY(str) str = (str.length() == 0 ? "null" : str)
 
 #endif
