@@ -1,7 +1,6 @@
 #include "schemas/process.h"
 #include "exceptions.h"
 
-
 inline bool fileExists(const std::string &name)
 {
     struct stat buffer;
@@ -243,9 +242,10 @@ std::string Process::getNetworkOut()
 inline void Process::_setUpNetNs()
 {
     const std::string netNsPath = "/var/run/netns/" + this->netNs;
+    mkdir("/var/run/netns", 0777);
     if (fileExists(netNsPath))
         return;
-    symlink((this->entryDirname + "ns/net").c_str(), netNsPath.c_str());
+    symlink((this->entryDirname + "/ns/net").c_str(), netNsPath.c_str());
 }
 
 inline void Process::_readNetworkStat()
@@ -267,13 +267,12 @@ inline void Process::_readNetworkStat()
             char type[4];
             unsigned long long bytes;
             // TX packets 1929747  bytes 481364580 (481.3 MB)
-            if (sscanf(line, "%s %*s %*s %*s %llu %*s %*s", type, &bytes) == 1)
-            {
-                if (type == "RX")
-                    totalRxBytes += bytes;
-                else if (type == "TX")
-                    totalTxBytes += bytes;
-            }
+            sscanf(line, "%s %*s %*s %*s %llu %*s %*s", type, &bytes);
+
+            if (strcmp(type, "RX") == 0)
+                totalRxBytes += bytes;
+            else if (strcmp(type, "TX") == 0)
+                totalTxBytes += bytes;
         }
 
         pclose(pipe);

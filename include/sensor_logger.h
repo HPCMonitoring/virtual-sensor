@@ -30,6 +30,7 @@ public:
     SensorLogger(SensorLogger &other) = delete;
     void operator=(const SensorLogger &) = delete;
     std::shared_ptr<spdlog::logger> getLogger(std::string loggerName = "");
+    ~SensorLogger();
 };
 
 #endif
