@@ -45,6 +45,7 @@ public:
     void registerHandler(WsCommand cmd, CmdHandler *handler);
     void send(const WsMessage &res) override;
     void onIdChange(std::string id) override;
+    std::unordered_map<std::string, std::string> getMetadata() override;
 };
 
 #endif

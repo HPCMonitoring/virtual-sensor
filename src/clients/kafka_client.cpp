@@ -26,7 +26,6 @@ KakfaClient::~KakfaClient()
     {
         i->second->stop();
     }
-    this->producer->flush(5000);
 }
 
 KakfaClient::Worker *KakfaClient::addWorker(KakfaClient::WorkerProp *prop)
@@ -39,6 +38,9 @@ KakfaClient::Worker *KakfaClient::addWorker(KakfaClient::WorkerProp *prop)
 KakfaClient::Worker::Worker(std::shared_ptr<RdKafka::Producer> handler, WorkerProp *prop)
 {
     std::string errMsg;
+    this->logger = SensorLogger::getInstance()->getLogger();
+
+    SPDLOG_LOGGER_INFO(this->logger, "Create worker {} for topic {}", std::to_string(long(this)), prop->topicName);
     this->prop = prop;
     RdKafka::Topic *topic = RdKafka::Topic::create(handler.get(), this->prop->topicName, NULL, errMsg);
     this->topic = topic;
@@ -61,15 +63,28 @@ void KakfaClient::Worker::_sendMessage()
     {
         try
         {
+            SPDLOG_LOGGER_INFO(this->logger, "Worker {} begins getting data", std::to_string(long(this)));
             std::vector<std::string> records = r.getData(this->prop->filter);
             const size_t numOfRecords = records.size();
+            SPDLOG_LOGGER_INFO(this->logger, "Worker {} found {} records", std::to_string(long(this)),  numOfRecords);
             for (size_t i = 0; i < numOfRecords; ++i)
             {
+                std::stringstream ss;
+                ss << records.at(i);
+                ss.seekp(-1, std::ios_base::end);
+                for (auto const &x : this->prop->headers)
+                {
+                    ss << ",\"" << x.first << "\":\"" << x.second << "\"";
+                }
+                ss << "}";
+
+                std::string payload = ss.str();
+
                 this->handler->produce(this->topic,
                                        RdKafka::Topic::PARTITION_UA,
                                        RdKafka::Producer::RK_MSG_COPY,
-                                       const_cast<char *>(records.at(i).c_str()),
-                                       records.at(i).size(),
+                                       const_cast<char *>(payload.c_str()),
+                                       payload.size(),
                                        NULL,  // Key
                                        0,     // Key length
                                        NULL); // Opaque value
@@ -78,7 +93,7 @@ void KakfaClient::Worker::_sendMessage()
         catch (std::exception &exception)
         {
             // TODO: SPD log error here
-            std::cout << exception.what();
+            SPDLOG_LOGGER_ERROR(this->logger, "Fail to send message to kafka with error message: {}", exception.what());
         }
         std::this_thread::sleep_for(std::chrono::seconds(this->prop->interval));
     }
@@ -94,13 +109,16 @@ void KakfaClient::Worker::stop()
 
 KakfaClient::Worker::~Worker()
 {
+    SPDLOG_LOGGER_INFO(this->logger, "Destructor of worker {} for topic {} is called", std::to_string(long(this)), prop->topicName);
+
     // Gracefully terminate thread
     this->stopFlag.store(true, std::memory_order_release);
     delete this->topic;
     delete this->prop;
 }
 
-KakfaClient::WorkerProp::WorkerProp(const std::string &topicName, Filter *filter, const time_t interval) : topicName(topicName), filter(filter), interval(interval)
+KakfaClient::WorkerProp::WorkerProp(std::string topicName, Filter *filter, const time_t interval, std::unordered_map<std::string, std::string> headers)
+    : topicName(std::move(topicName)), filter(filter), interval(interval), headers(std::move(headers))
 {
     // do nothing
 }

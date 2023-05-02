@@ -1,12 +1,11 @@
 #include "handlers/ws_message.h"
+#include <sstream>
 
-WsMessage::WsMessage()
-{
+WsMessage::WsMessage() {
     // do nothing
 }
 
-WsMessage::WsMessage(WsMessage &&other)
-{
+WsMessage::WsMessage(WsMessage &&other) {
     this->cmd = other.cmd;
     this->coordId = other.coordId;
     this->msg = other.msg;
@@ -14,36 +13,28 @@ WsMessage::WsMessage(WsMessage &&other)
     this->payload = other.payload;
 }
 
-WsMessage WsMessage::from(const WsMessage &other)
-{
+WsMessage WsMessage::from(const WsMessage &other) {
     WsMessage cp;
     cp.cmd = other.cmd;
     cp.coordId = other.coordId;
     return std::move(cp);
 }
 
-std::string WsMessage::toJson() const
-{
-    auto format = boost::format("{"
-                                "\"cmd\": %d,"
-                                "\"message\": \"%s\", "
-                                "\"error\": %d, "
-                                "\"coordId\": \"%s\","
-                                "\"payload\": %s"
-                                "}");
-    return boost::str(
-        format %
-        this->cmd %
-        this->msg %
-        this->error %
-        this->coordId %
-        (this->payload ? this->payload->toJson() : "{}"));
+std::string WsMessage::toJson() const {
+    std::stringstream ss;
+
+    ss    << "{"
+          << "\"cmd\":"     <<          this->cmd       << ","
+          << "\"message\":" << "\"" <<  this->msg       << "\"" << ","
+          << "\"error\":"   <<          this->error     << ","
+          << "\"coordId\":" << "\"" <<   this->coordId  << "\"" << ","
+          << "\"payload\":" << (this->payload ? this->payload->toJson() : "{}")
+          << "}";
+    return ss.str();
 }
 
-WsMessage::~WsMessage()
-{
-    if (this->payload != nullptr)
-    {
+WsMessage::~WsMessage() {
+    if (this->payload != nullptr) {
         delete this->payload;
     }
 }
