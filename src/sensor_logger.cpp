@@ -66,3 +66,9 @@ SensorLogger *SensorLogger::getInstance()
     }
     return _singleton;
 }
+
+SensorLogger::~SensorLogger() {
+    if(_singleton != nullptr) {
+        delete _singleton;
+    }
+}

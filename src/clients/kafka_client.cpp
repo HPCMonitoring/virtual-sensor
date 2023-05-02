@@ -7,7 +7,7 @@ KakfaClient::KakfaClient(const std::string &clientId, const std::string &brokerU
     conf->set("client.id", clientId, errstr);
     conf->set("bootstrap.servers", brokerUrl, errstr);
     conf->set("linger.ms", "500", errstr);
-    conf->set("compression.type", "snappy", errstr);
+    // conf->set("compression.type", "snappy", errstr);
     conf->set("acks", "0", errstr);
 
     RdKafka::Producer *kafkaProducer = RdKafka::Producer::create(conf, errstr);
