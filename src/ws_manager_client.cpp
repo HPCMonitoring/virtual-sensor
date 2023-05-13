@@ -55,10 +55,10 @@ void SensorManagerClient::registerHandler(WsCommand cmd, CmdHandler *handler)
     _fmap[cmd] = handler;
 }
 
-void SensorManagerClient::on_message(const ix::WebSocketMessagePtr &msg)
+void SensorManagerClient::onMessage(const ix::WebSocketMessagePtr &msg)
 {
     std::stringstream ss;
-    ss << "on_message called with message: " << msg->str;
+    ss << "onMessage called with message: " << msg->str;
     SPDLOG_LOGGER_INFO(this->_logger, ss.str());
 
     json msgJson = json::parse(msg->str);
@@ -87,29 +87,29 @@ void SensorManagerClient::on_message(const ix::WebSocketMessagePtr &msg)
     catch (const std::exception &e)
     {
         std::stringstream ss;
-        ss << "on_message handling error with message: " << e.what();
+        ss << "onMessage handling error with message: " << e.what();
         SPDLOG_LOGGER_ERROR(this->_logger, ss.str());
     }
 }
 
-void SensorManagerClient::on_open(const ix::WebSocketMessagePtr &msg)
+void SensorManagerClient::onOpen(const ix::WebSocketMessagePtr &msg)
 {
     std::stringstream ss;
-    ss << "on_open called with message: " << msg->str;
+    ss << "onOpen called with message: " << msg->str;
     SPDLOG_LOGGER_INFO(this->_logger, ss.str());
 }
 
-void SensorManagerClient::on_error(const ix::WebSocketMessagePtr &msg)
+void SensorManagerClient::onError(const ix::WebSocketMessagePtr &msg)
 {
     std::stringstream ss;
-    ss << "on_error called with message: " << msg->errorInfo.reason;
+    ss << "onError called with message: " << msg->errorInfo.reason;
     SPDLOG_LOGGER_ERROR(this->_logger, ss.str());
 }
 
-void SensorManagerClient::on_close(const ix::WebSocketMessagePtr &msg)
+void SensorManagerClient::onClose(const ix::WebSocketMessagePtr &msg)
 {
     std::stringstream ss;
-    ss << "on_close called with code: " << msg->closeInfo.code
+    ss << "onClose called with code: " << msg->closeInfo.code
         << ", message: " << msg->closeInfo.reason;
     SPDLOG_LOGGER_ERROR(this->_logger, ss.str());
 }
@@ -159,16 +159,16 @@ void SensorManagerClient::run()
                                     {
            switch (msg->type) {
                case ix::WebSocketMessageType::Message:
-                   this->on_message(msg);
+                   this->onMessage(msg);
                    break;
                case ix::WebSocketMessageType::Open:
-                   on_open(msg);
+                   onOpen(msg);
                    break;
                case ix::WebSocketMessageType::Close:
-                   on_close(msg);
+                   onClose(msg);
                    break;
                case ix::WebSocketMessageType::Error:
-                   on_error(msg);
+                   onError(msg);
                    break;
                default:
                    break;

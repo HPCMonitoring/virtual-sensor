@@ -41,7 +41,7 @@ std::vector<std::string> Repository::getData(const Filter *filter)
             for (size_t i = 0; i < numOfProcesses; ++i)
             {
                 Process proc(allPids.at(i));
-                if (!proc.exists() || !filter->selection->validate(&proc))
+                if (!proc.exists() || (filter->selection != nullptr && !filter->selection->validate(&proc)))
                     continue;
 
                 results.push_back(filter->iterateProc(&proc));

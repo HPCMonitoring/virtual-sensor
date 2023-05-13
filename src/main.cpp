@@ -26,8 +26,12 @@ void mainThreadHandler()
 
 void signalHandler(int signal)
 {
-    std::cout << "\nInterrupt signal (" << signal << ") received.\n";
-    delete client;
+    std::cout << "Interrupt signal (" << signal << ") received.\n";
+    if (client != nullptr)
+        delete client;
+    else
+        std::cout << "Please wait until resources are cleaned up !\n";
+    client = nullptr;
 }
 
 void readSampleProc();
@@ -39,16 +43,9 @@ void readSampleDisk();
 
 int main(int argc, char *argv[])
 {
-    // signal(SIGINT, signalHandler);
-    // mainThread = std::thread(mainThreadHandler);
-    // mainThread.join();
-
-    readSampleProc();
-    // readSampleCpu();
-    // readSampleMemory();
-    // readSampleNetwork();
-    // readSampleIO();
-    // readSampleDisk();
+    signal(SIGINT, signalHandler);
+    mainThread = std::thread(mainThreadHandler);
+    mainThread.join();
 
     return 0;
 }

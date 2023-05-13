@@ -31,10 +31,10 @@ private:
 protected:
     SensorManagerClient();
     std::string buildConnStr();
-    void on_message(const ix::WebSocketMessagePtr &msg);
-    void on_open(const ix::WebSocketMessagePtr &msg);
-    void on_error(const ix::WebSocketMessagePtr &msg);
-    void on_close(const ix::WebSocketMessagePtr &msg);
+    void onMessage(const ix::WebSocketMessagePtr &msg);
+    void onOpen(const ix::WebSocketMessagePtr &msg);
+    void onError(const ix::WebSocketMessagePtr &msg);
+    void onClose(const ix::WebSocketMessagePtr &msg);
 
 public:
     static SensorManagerClient *getInstance();
