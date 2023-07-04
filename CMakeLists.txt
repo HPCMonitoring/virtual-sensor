@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.0)
 project(virtual_sensor VERSION 0.1.0)
+
+set_target_properties(${TARGET_NAME} PROPERTIES
+            CXX_STANDARD 17
+            CXX_EXTENSIONS OFF
+            )
+
 # Add the path to the librdkafka header files to the include path
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
